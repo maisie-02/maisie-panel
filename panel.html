@@ -1,18 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-(function(){
-  const sb = supabase.createClient(
-    'https://kjfglthwocbzinkiyfxm.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZmdsdGh3b2Niemlua2l5ZnhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDA0ODMsImV4cCI6MjA5ODI3NjQ4M30.IDDfWZf0Q2DW2DTm6hmoPsQDsFmBzZmkZP1KKjxJct8'
-  );
-  sb.auth.getSession().then(({data:{session}})=>{
-    if(!session) window.location.href='index.html';
-  });
-})();
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>各平台最新下载链接</title>
@@ -1451,6 +1439,134 @@ function renderFollowup() {
 }
 
 try { renderFollowup(); } catch(e) { console.warn('followup render error:', e); }
+</script>
+
+<!-- ── 管理员面板（仅 maisie 可见） ── -->
+<style>
+#adminBtn{position:fixed;bottom:28px;right:28px;z-index:9999;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(102,126,234,.4);letter-spacing:1px;display:none;}
+#adminBtn:hover{opacity:.9;}
+#adminMask{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;}
+#adminModal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;padding:32px 28px 24px;width:480px;max-width:96vw;max-height:85vh;overflow-y:auto;z-index:10001;box-shadow:0 12px 48px rgba(0,0,0,.18);}
+#adminModal h2{font-size:17px;color:#1a1f36;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:12px;}
+.adm-section{margin-bottom:22px;}
+.adm-section h3{font-size:13px;color:#667eea;font-weight:700;margin-bottom:10px;letter-spacing:1px;}
+.adm-row{display:flex;gap:8px;margin-bottom:8px;}
+.adm-input{flex:1;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;outline:none;}
+.adm-input:focus{border-color:#667eea;}
+.adm-btn{padding:8px 14px;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.adm-btn.primary{background:#667eea;color:#fff;}
+.adm-btn.danger{background:#fed7d7;color:#c53030;}
+.adm-btn.warn{background:#fefcbf;color:#744210;}
+.adm-btn:hover{opacity:.85;}
+#userTable{width:100%;border-collapse:collapse;font-size:12px;}
+#userTable th{background:#f7f8fc;color:#4a5568;padding:7px 8px;text-align:left;font-weight:600;}
+#userTable td{padding:7px 8px;border-bottom:1px solid #f0f0f0;color:#2d3748;}
+#adminMsg{font-size:12px;color:#e53e3e;margin-top:8px;min-height:16px;}
+#adminCloseBtn{position:absolute;top:14px;right:18px;background:none;border:none;font-size:20px;cursor:pointer;color:#999;}
+</style>
+
+<button id="adminBtn" onclick="openAdmin()">⚙ 账号管理</button>
+<div id="adminMask" onclick="closeAdmin()"></div>
+<div id="adminModal" style="display:none;position:fixed;">
+  <button id="adminCloseBtn" onclick="closeAdmin()">×</button>
+  <h2>账号管理</h2>
+
+  <div class="adm-section">
+    <h3>新增账号</h3>
+    <div class="adm-row">
+      <input class="adm-input" id="newName" placeholder="花名拼音（如 xiaohong）" />
+      <input class="adm-input" id="newPw" placeholder="初始密码" />
+      <button class="adm-btn primary" onclick="adminCreate()">新增</button>
+    </div>
+    <div id="adminMsg"></div>
+  </div>
+
+  <div class="adm-section">
+    <h3>账号列表</h3>
+    <table id="userTable">
+      <thead><tr><th>花名</th><th>最后登录</th><th>操作</th></tr></thead>
+      <tbody id="userTbody"><tr><td colspan="3" style="color:#aaa">加载中...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+(function(){
+  const SB_URL  = 'https://kjfglthwocbzinkiyfxm.supabase.co';
+  const SB_SVC  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZmdsdGh3b2Niemlua2l5ZnhtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjcwMDQ4MywiZXhwIjoyMDk4Mjc2NDgzfQ.DflCxDTmFocH5e0_JiDv82dxGWeEX1cnWtj8hUqwOTI';
+  const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZmdsdGh3b2Niemlua2l5ZnhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDA0ODMsImV4cCI6MjA5ODI3NjQ4M30.IDDfWZf0Q2DW2DTm6hmoPsQDsFmBzZmkZP1KKjxJct8';
+  const ADMIN_EMAIL = 'maisie@hr.co';
+
+  const sb = supabase.createClient(SB_URL, SB_ANON);
+
+  // 检查是否 admin
+  sb.auth.getSession().then(({data:{session}})=>{
+    if(session && session.user.email === ADMIN_EMAIL){
+      document.getElementById('adminBtn').style.display = 'block';
+    }
+  });
+
+  window.openAdmin = function(){
+    document.getElementById('adminMask').style.display = 'block';
+    document.getElementById('adminModal').style.display = 'block';
+    loadUsers();
+  };
+  window.closeAdmin = function(){
+    document.getElementById('adminMask').style.display = 'none';
+    document.getElementById('adminModal').style.display = 'none';
+  };
+
+  async function api(method, path, body){
+    const r = await fetch(SB_URL + path, {
+      method, headers:{ apikey: SB_SVC, Authorization:'Bearer '+SB_SVC, 'Content-Type':'application/json' },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    return r.json().catch(()=>({}));
+  }
+
+  async function loadUsers(){
+    const d = await api('GET','/auth/v1/admin/users?per_page=50');
+    const users = d.users || [];
+    const tbody = document.getElementById('userTbody');
+    if(!users.length){ tbody.innerHTML='<tr><td colspan="3" style="color:#aaa">暂无账号</td></tr>'; return; }
+    tbody.innerHTML = users.map(u=>{
+      const name = u.email.replace('@hr.co','');
+      const last = u.last_sign_in_at ? u.last_sign_in_at.slice(0,19).replace('T',' ') : '从未';
+      return `<tr>
+        <td><b>${name}</b></td>
+        <td style="color:#718096">${last}</td>
+        <td style="display:flex;gap:5px;flex-wrap:wrap">
+          <button class="adm-btn warn" onclick="adminReset('${u.id}','${name}')">重置密码</button>
+          ${name!=='maisie'?`<button class="adm-btn danger" onclick="adminDel('${u.id}','${name}')">删除</button>`:''}
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  window.adminCreate = async function(){
+    const name = document.getElementById('newName').value.trim();
+    const pw   = document.getElementById('newPw').value.trim();
+    const msg  = document.getElementById('adminMsg');
+    if(!name||!pw){ msg.textContent='花名和密码不能为空'; return; }
+    msg.style.color='#718096'; msg.textContent='创建中...';
+    const d = await api('POST','/auth/v1/admin/users',{email:`${name}@hr.co`,password:pw,email_confirm:true});
+    if(d.id){ msg.style.color='#38a169'; msg.textContent=`✅ 已新增：${name} / ${pw}`; document.getElementById('newName').value=''; document.getElementById('newPw').value=''; loadUsers(); }
+    else{ msg.style.color='#e53e3e'; msg.textContent='❌ '+(d.msg||d.error||'创建失败，花名可能重复'); }
+  };
+
+  window.adminDel = async function(uid, name){
+    if(!confirm(`确认删除「${name}」的账号？`)) return;
+    await api('DELETE',`/auth/v1/admin/users/${uid}`);
+    loadUsers();
+  };
+
+  window.adminReset = async function(uid, name){
+    const pw = prompt(`为「${name}」设置新密码：`);
+    if(!pw) return;
+    await api('PUT',`/auth/v1/admin/users/${uid}`,{password:pw});
+    alert(`✅ 密码已重置为：${pw}`);
+  };
+})();
 </script>
 </body>
 </html>
