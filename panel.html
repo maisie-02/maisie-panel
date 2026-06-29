@@ -211,6 +211,20 @@
     </div>
   </div>
   <div class="nav-item" id="nav-followup" onclick="showSection('followup',this)">待跟进事项</div>
+
+  <!-- 用户信息 + 退出 -->
+  <div id="sidebar-user" style="position:sticky;bottom:0;border-top:1px solid var(--sidebar-border);background:var(--sidebar-bg);padding:12px 16px;margin-top:auto;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--sidebar-active-bg);display:flex;align-items:center;justify-content:center;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--sidebar-active-text)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+      </div>
+      <span id="sidebar-username" style="font-size:13px;font-weight:600;color:var(--sidebar-text);">加载中...</span>
+    </div>
+    <div onclick="doLogout()" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:5px 0;color:var(--sidebar-text-sub);font-size:12px;transition:color .2s;" onmouseover="this.style.color='#e53e3e'" onmouseout="this.style.color='var(--sidebar-text-sub)'">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 7l-1.4 1.4L18.2 11H8v2h10.2l-2.6 2.6L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+      退出登录
+    </div>
+  </div>
 </div>
 
 <div class="main">
@@ -1511,12 +1525,21 @@ try { renderFollowup(); } catch(e) { console.warn('followup render error:', e); 
 
   const sb = supabase.createClient(SB_URL, SB_ANON);
 
-  // 检查是否 admin
+  // 检查 session，显示用户名 + admin 按钮
   sb.auth.getSession().then(({data:{session}})=>{
-    if(session && session.user.email === ADMIN_EMAIL){
-      document.getElementById('adminBtn').style.display = 'block';
+    if(session){
+      const name = session.user.email.replace('@hr.co','');
+      document.getElementById('sidebar-username').textContent = name;
+      if(session.user.email === ADMIN_EMAIL){
+        document.getElementById('adminBtn').style.display = 'block';
+      }
     }
   });
+
+  window.doLogout = async function(){
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  };
 
   window.openAdmin = function(){
     document.getElementById('adminMask').style.display = 'block';
