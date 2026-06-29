@@ -1530,14 +1530,15 @@ try { renderFollowup(); } catch(e) { console.warn('followup render error:', e); 
   const ALL_SECTIONS = ['dl','aiengine','nodomain','report','followup'];
 
   // 检查 session，显示中文名 + 权限控制 + admin 按钮
-  sb.auth.getSession().then(({data:{session}})=>{
+  sb.auth.getUser().then(({data:{user}})=>{
+    const session = user ? {user} : null;
     if(!session){ window.location.href='index.html'; return; }
-    const meta = session.user.user_metadata || {};
-    const displayName = meta.display_name || session.user.email.replace('@hr.co','');
+    const meta = user.user_metadata || {};
+    const displayName = meta.display_name || user.email.replace('@hr.co','');
     document.getElementById('sidebar-username').textContent = displayName;
 
     // 权限控制：admin 看全部，其他人按 sections 过滤
-    if(session.user.email === ADMIN_EMAIL){
+    if(user.email === ADMIN_EMAIL){
       document.getElementById('adminBtn').style.display = 'block';
     } else {
       const allowed = meta.sections || [];
