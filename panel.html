@@ -2,6 +2,17 @@
 <html lang="zh-CN">
 <head>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  const sb = supabase.createClient(
+    'https://kjfglthwocbzinkiyfxm.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZmdsdGh3b2Niemlua2l5ZnhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDA0ODMsImV4cCI6MjA5ODI3NjQ4M30.IDDfWZf0Q2DW2DTm6hmoPsQDsFmBzZmkZP1KKjxJct8'
+  );
+  sb.auth.getSession().then(({data:{session}})=>{
+    if(!session) window.location.href='index.html';
+  });
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>各平台最新下载链接</title>
