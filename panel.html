@@ -2,17 +2,6 @@
 <html lang="zh-CN">
 <head>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-(function(){
-  const sb = supabase.createClient(
-    'https://kjfglthwocbzinkiyfxm.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZmdsdGh3b2Niemlua2l5ZnhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDA0ODMsImV4cCI6MjA5ODI3NjQ4M30.IDDfWZf0Q2DW2DTm6hmoPsQDsFmBzZmkZP1KKjxJct8'
-  );
-  sb.auth.getSession().then(({data:{session}})=>{
-    if(!session) window.location.href='index.html';
-  });
-})();
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>各平台最新下载链接</title>
@@ -1500,18 +1489,31 @@ try { renderFollowup(); } catch(e) { console.warn('followup render error:', e); 
   <div class="adm-section">
     <h3>新增账号</h3>
     <div class="adm-row">
-      <input class="adm-input" id="newName" placeholder="花名拼音（如 xiaohong）" />
-      <input class="adm-input" id="newPw" placeholder="初始密码" />
-      <button class="adm-btn primary" onclick="adminCreate()">新增</button>
+      <input class="adm-input" id="newDisplayName" placeholder="中文显示名（如 梅西）" />
+      <input class="adm-input" id="newName" placeholder="登录账号拼音（如 maisie）" />
     </div>
+    <div class="adm-row">
+      <input class="adm-input" id="newPw" placeholder="初始密码" />
+    </div>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:12px;color:#4a5568;font-weight:600;margin-bottom:6px;">可查看模块：</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="dl" checked> 各平台下载链接</label>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="aiengine"> AI引擎</label>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="nodomain"> 无启用域名</label>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="report"> 数据报表</label>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="followup"> 待跟进事项</label>
+      </div>
+    </div>
+    <button class="adm-btn primary" onclick="adminCreate()">新增账号</button>
     <div id="adminMsg"></div>
   </div>
 
   <div class="adm-section">
     <h3>账号列表</h3>
     <table id="userTable">
-      <thead><tr><th>花名</th><th>最后登录</th><th>操作</th></tr></thead>
-      <tbody id="userTbody"><tr><td colspan="3" style="color:#aaa">加载中...</td></tr></tbody>
+      <thead><tr><th>显示名</th><th>账号</th><th>最后登录</th><th>操作</th></tr></thead>
+      <tbody id="userTbody"><tr><td colspan="4" style="color:#aaa">加载中...</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -1525,14 +1527,31 @@ try { renderFollowup(); } catch(e) { console.warn('followup render error:', e); 
 
   const sb = supabase.createClient(SB_URL, SB_ANON);
 
-  // 检查 session，显示用户名 + admin 按钮
+  const ALL_SECTIONS = ['dl','aiengine','nodomain','report','followup'];
+
+  // 检查 session，显示中文名 + 权限控制 + admin 按钮
   sb.auth.getSession().then(({data:{session}})=>{
-    if(session){
-      const name = session.user.email.replace('@hr.co','');
-      document.getElementById('sidebar-username').textContent = name;
-      if(session.user.email === ADMIN_EMAIL){
-        document.getElementById('adminBtn').style.display = 'block';
-      }
+    if(!session){ window.location.href='index.html'; return; }
+    const meta = session.user.user_metadata || {};
+    const displayName = meta.display_name || session.user.email.replace('@hr.co','');
+    document.getElementById('sidebar-username').textContent = displayName;
+
+    // 权限控制：admin 看全部，其他人按 sections 过滤
+    if(session.user.email === ADMIN_EMAIL){
+      document.getElementById('adminBtn').style.display = 'block';
+    } else {
+      const allowed = meta.sections || [];
+      ALL_SECTIONS.forEach(sec => {
+        if(!allowed.includes(sec)){
+          // 隐藏对应导航项
+          const grpHeader = document.getElementById('grp-header-'+sec);
+          const grpItems  = document.getElementById('grp-items-'+sec);
+          const navItem   = document.getElementById('nav-'+sec);
+          if(grpHeader) grpHeader.style.display='none';
+          if(grpItems)  grpItems.style.display='none';
+          if(navItem)   navItem.style.display='none';
+        }
+      });
     }
   });
 
@@ -1563,30 +1582,50 @@ try { renderFollowup(); } catch(e) { console.warn('followup render error:', e); 
     const d = await api('GET','/auth/v1/admin/users?per_page=50');
     const users = d.users || [];
     const tbody = document.getElementById('userTbody');
-    if(!users.length){ tbody.innerHTML='<tr><td colspan="3" style="color:#aaa">暂无账号</td></tr>'; return; }
+    if(!users.length){ tbody.innerHTML='<tr><td colspan="4" style="color:#aaa">暂无账号</td></tr>'; return; }
+    const secLabel = {dl:'下载链接',aiengine:'AI引擎',nodomain:'无启用域名',report:'数据报表',followup:'待跟进'};
     tbody.innerHTML = users.map(u=>{
-      const name = u.email.replace('@hr.co','');
+      const loginName = u.email.replace('@hr.co','');
+      const displayName = (u.user_metadata||{}).display_name || loginName;
+      const sections = (u.user_metadata||{}).sections || ALL_SECTIONS;
       const last = u.last_sign_in_at ? u.last_sign_in_at.slice(0,19).replace('T',' ') : '从未';
+      const secTags = sections.map(s=>`<span style="background:#edf3f1;color:#3d7a6e;border-radius:4px;padding:1px 5px;font-size:11px;">${secLabel[s]||s}</span>`).join(' ');
       return `<tr>
-        <td><b>${name}</b></td>
-        <td style="color:#718096">${last}</td>
-        <td style="display:flex;gap:5px;flex-wrap:wrap">
-          <button class="adm-btn warn" onclick="adminReset('${u.id}','${name}')">重置密码</button>
-          ${name!=='maisie'?`<button class="adm-btn danger" onclick="adminDel('${u.id}','${name}')">删除</button>`:''}
+        <td><b>${displayName}</b><br><span style="color:#aaa;font-size:11px">${loginName}</span></td>
+        <td>${secTags}</td>
+        <td style="color:#718096;white-space:nowrap">${last}</td>
+        <td style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="adm-btn warn" onclick="adminReset('${u.id}','${displayName}')">改密码</button>
+          ${loginName!=='maisie'?`<button class="adm-btn danger" onclick="adminDel('${u.id}','${displayName}')">删除</button>`:''}
         </td>
       </tr>`;
     }).join('');
   }
 
   window.adminCreate = async function(){
+    const displayName = document.getElementById('newDisplayName').value.trim();
     const name = document.getElementById('newName').value.trim();
     const pw   = document.getElementById('newPw').value.trim();
     const msg  = document.getElementById('adminMsg');
-    if(!name||!pw){ msg.textContent='花名和密码不能为空'; return; }
+    if(!displayName||!name||!pw){ msg.textContent='显示名、账号、密码不能为空'; return; }
+    const checks = document.querySelectorAll('#adminModal input[type=checkbox]:checked');
+    const sections = Array.from(checks).map(c=>c.value);
     msg.style.color='#718096'; msg.textContent='创建中...';
-    const d = await api('POST','/auth/v1/admin/users',{email:`${name}@hr.co`,password:pw,email_confirm:true});
-    if(d.id){ msg.style.color='#38a169'; msg.textContent=`✅ 已新增：${name} / ${pw}`; document.getElementById('newName').value=''; document.getElementById('newPw').value=''; loadUsers(); }
-    else{ msg.style.color='#e53e3e'; msg.textContent='❌ '+(d.msg||d.error||'创建失败，花名可能重复'); }
+    const d = await api('POST','/auth/v1/admin/users',{
+      email:`${name}@hr.co`, password:pw, email_confirm:true,
+      user_metadata:{ display_name: displayName, sections }
+    });
+    if(d.id){
+      msg.style.color='#38a169';
+      msg.textContent=`✅ 已新增：${displayName}（${name}）/ ${pw}`;
+      document.getElementById('newDisplayName').value='';
+      document.getElementById('newName').value='';
+      document.getElementById('newPw').value='';
+      loadUsers();
+    } else {
+      msg.style.color='#e53e3e';
+      msg.textContent='❌ '+(d.msg||d.error||'创建失败，账号可能重复');
+    }
   };
 
   window.adminDel = async function(uid, name){
