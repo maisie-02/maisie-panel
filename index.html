@@ -74,7 +74,7 @@ body {
   </div>
   <div class="field">
     <label>账号</label>
-    <input type="email" id="email" placeholder="请输入账号" autocomplete="username" />
+    <input type="text" id="email" placeholder="请输入账号" autocomplete="username" />
   </div>
   <div class="field">
     <label>密码</label>
@@ -100,7 +100,8 @@ document.getElementById('password').addEventListener('keydown', e => {
 })
 
 async function doLogin() {
-  const email = document.getElementById('email').value.trim()
+  const raw = document.getElementById('email').value.trim()
+  const email = raw.includes('@') ? raw : raw + '@panel.com'
   const password = document.getElementById('password').value
   const btn = document.getElementById('loginBtn')
   const err = document.getElementById('errMsg')
