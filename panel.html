@@ -45,7 +45,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; background: var(--main-bg); color: var(--text-primary); display: flex; height: 100vh; overflow: hidden; }
-  .sidebar { width: 200px; min-width: 200px; background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border); overflow-y: auto; box-shadow: 2px 0 8px rgba(0,0,0,0.06); }
+  .sidebar { width: 200px; min-width: 200px; background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border); overflow-y: auto; box-shadow: 2px 0 8px rgba(0,0,0,0.06); display:flex; flex-direction:column; }
   .sidebar-header { padding: 20px 16px; font-size: 13px; font-weight: 700; color: var(--sidebar-header-text); border-bottom: 1px solid var(--sidebar-border); letter-spacing: 0.5px; }
   .nav-item { padding: 12px 16px; cursor: pointer; font-size: 13px; color: var(--sidebar-text); transition: all 0.2s; border-left: 3px solid transparent; }
   .nav-item:hover { background: var(--sidebar-hover-bg); color: var(--text-primary); }
@@ -78,7 +78,7 @@
   .copy-btn { font-size: 11px; padding: 3px 8px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 4px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
   .copy-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
   .no-domain { font-size: 12px; color: var(--text-muted); font-style: italic; padding: 4px 0; }
-  .update-time { font-size: 11px; color: var(--text-muted); margin-top: 24px; text-align: right; }
+  .update-time { font-size: 11px; color: var(--text-muted); }
   .toast { position: fixed; bottom: 24px; right: 24px; background: #4ade80; color: #0f1a0f; padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
   .toast.show { opacity: 1; }
   .upload-btn { padding: 7px 16px; background: var(--accent); border: none; border-radius: 6px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
@@ -189,6 +189,8 @@
 <body>
 <div class="sidebar">
   <div class="sidebar-header">客服中心4部-恒睿早班</div>
+  <!-- 导航区（flex:1 撑满剩余空间，把用户块推到底部） -->
+  <div style="flex:1;overflow-y:auto;">
   <div class="nav-group">
     <div class="nav-group-header active" id="grp-header-dl" onclick="toggleGroup('dl')">
       各平台下载链接 <span class="arrow">▾</span>
@@ -211,9 +213,10 @@
     </div>
   </div>
   <div class="nav-item" id="nav-followup" onclick="showSection('followup',this)">待跟进事项</div>
+  </div><!-- end nav-scroll -->
 
-  <!-- 用户信息 + 退出 -->
-  <div id="sidebar-user" style="position:sticky;bottom:0;border-top:1px solid var(--sidebar-border);background:var(--sidebar-bg);padding:12px 16px;margin-top:auto;">
+  <!-- 用户信息 + 退出（始终在底部） -->
+  <div id="sidebar-user" style="flex-shrink:0;border-top:1px solid var(--sidebar-border);background:var(--sidebar-bg);padding:12px 16px;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
       <div style="width:28px;height:28px;border-radius:50%;background:var(--sidebar-active-bg);display:flex;align-items:center;justify-content:center;">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--sidebar-active-text)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
@@ -233,6 +236,7 @@
   <div class="section active" id="section-download">
     <div class="section-header-row">
       <div class="main-header">各平台最新下载链接</div>
+      <span class="update-time section-update-time" style="margin-left:auto;margin-right:12px;align-self:center;"></span>
       <button class="upload-btn" onclick="openUpload('hengrui')">一键上传表单</button>
     </div>
     <div class="stats">
@@ -240,24 +244,26 @@
       <div class="stat-card"><div class="stat-num" id="main-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
     <div id="main-platforms"></div>
-    <div class="update-time">最后更新：2026-06-28</div>
   </div>
 
   <!-- 其余平台 -->
   <div class="section" id="section-other">
-    <div class="main-header">其余平台</div>
+    <div class="section-header-row">
+      <div class="main-header">其余平台</div>
+      <span class="update-time section-update-time" style="margin-left:auto;align-self:center;"></span>
+    </div>
     <div class="stats">
       <div class="stat-card"><div class="stat-num">15</div><div class="stat-label">有效子平台</div></div>
       <div class="stat-card"><div class="stat-num" id="other-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
     <div id="other-platforms"></div>
-    <div class="update-time">最后更新：2026-06-28</div>
   </div>
 
   <!-- 逸品站2 -->
   <div class="section" id="section-yipin2">
     <div class="section-header-row">
       <div class="main-header">逸品站2 下载链接</div>
+      <span class="update-time section-update-time" style="margin-left:auto;margin-right:12px;align-self:center;"></span>
       <button class="upload-btn" onclick="openUpload('yipin')">一键上传表单</button>
     </div>
     <div class="stats">
@@ -265,13 +271,13 @@
       <div class="stat-card"><div class="stat-num" id="yipin2-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
     <div id="yipin2-platforms"></div>
-    <div class="update-time">最后更新：2026-06-28</div>
   </div>
 
   <!-- 逸品组 -->
   <div class="section" id="section-yipin">
     <div class="section-header-row">
       <div class="main-header">逸品组 下载链接</div>
+      <span class="update-time section-update-time" style="margin-left:auto;margin-right:12px;align-self:center;"></span>
       <button class="upload-btn" onclick="openUpload('yipin')">一键上传表单</button>
     </div>
     <div class="stats">
@@ -279,18 +285,19 @@
       <div class="stat-card"><div class="stat-num" id="yipin-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
     <div id="yipin-platforms"></div>
-    <div class="update-time">最后更新：2026-06-28</div>
   </div>
 
   <!-- AI引擎 -->
   <div class="section" id="section-aiengine">
-    <div class="main-header">AI引擎</div>
+    <div class="section-header-row">
+      <div class="main-header">AI引擎</div>
+      <span class="update-time section-update-time" style="margin-left:auto;align-self:center;"></span>
+    </div>
     <div class="stats">
       <div class="stat-card"><div class="stat-num">5</div><div class="stat-label">平台总数</div></div>
       <div class="stat-card"><div class="stat-num" id="ai-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
     <div id="ai-platforms"></div>
-    <div class="update-time">最后更新：2026-06-28</div>
   </div>
 
   <!-- 无启用域名 -->
@@ -408,6 +415,7 @@
   <div class="section" id="section-yipin-all">
     <div class="section-header-row">
       <div class="main-header">逸品 下载链接</div>
+      <span class="update-time section-update-time" style="margin-left:auto;margin-right:12px;align-self:center;"></span>
       <button class="upload-btn" onclick="openUpload('yipin')">一键上传表单</button>
     </div>
     <div class="stats">
@@ -422,7 +430,6 @@
       ▍ 站2
     </div>
     <div id="yipin-all-z2"></div>
-    <div class="update-time">最后更新：2026-06-28</div>
   </div>
 
 </div>
@@ -451,49 +458,49 @@
 // MAIN_DATA_START
 // qm = 全民代理, qd = 渠道代理 (null = 无)
 const mainData = [
-  {name:'91视频',   qm:'https://puvi25.4t4drrb.work',      qd:'https://yuni_qd_3895604_187I4H4I.ou37uski.work'},
+  {name:'91视频',   qm:'https://uav23k.4t4drrb.work',      qd:'https://yuni_qd_3895604_187I4H4I.ou37uski.work'},
   {name:'91重口',   qm:'https://znl_qm_ac_36932_15nt2441.fp3z8d2y.work',          qd:'https://hl_qd_ac_60378_bmf73k77.fp3z8d2y.work'},
-  {name:'51动漫',   qm:'https://e0p4cz.8n40l8k.work',          qd:'https://51dm_12_B9VH0668.z0f4j3q7.work'},
-  {name:'51吃瓜',   qm:'https://r1u8gn.2eye3ws.work',        qd:'https://51mp_121_1OVQ69QM.5s6yvttn.work'},
-  {name:'51乱伦',   qm:'https://ss3s8v.6vu8550.work',      qd:'https://51ll_qm_369_3X0H87E0.r5ij2hl1.work'},
-  {name:'acfan',    qm:'https://m45ezo.8a5m0cg.work',         qd:'https://trmh_ac_663_301y5bj3.klb97nvc.work'},
-  {name:'soul',     qm:'https://2yyhcz.cstono5.work',          qd:'https://slrqd_2525_895N35TE.lu8oscwo.work'},
-  {name:'tiktok',   qm:'https://t20o5m.9z9rzxt.work',       qd:'https://tk_qd_ac_60378_SG2M4U7T.yp4dfejf.work'},
-  {name:'xv',       qm:'https://sby3fj.7bdn2t7.work',            qd:'https://tq_qd_3895604_T146L642.72iq4893.work'},
-  {name:'大老二',   qm:'https://n3vha0.3fckbch.work',       qd:'https://dle_qd_389_J2DWLJL4.44ityrdz.work'},
+  {name:'51动漫',   qm:'https://oe1hmc.8n40l8k.work',          qd:'https://51dm_12_B9VH0668.z0f4j3q7.work'},
+  {name:'51吃瓜',   qm:'https://ros82l.2eye3ws.work',        qd:'https://51mp_121_1OVQ69QM.5s6yvttn.work'},
+  {name:'51乱伦',   qm:'https://0q7muf.6vu8550.work',      qd:'https://51ll_qm_369_3X0H87E0.r5ij2hl1.work'},
+  {name:'acfan',    qm:'https://ii3hq1.8a5m0cg.work',         qd:'https://trmh_ac_663_301y5bj3.klb97nvc.work'},
+  {name:'soul',     qm:'https://blyal5.cstono5.work',          qd:'https://slrqd_2525_895N35TE.lu8oscwo.work'},
+  {name:'tiktok',   qm:'https://j89zhg.9z9rzxt.work',       qd:'https://tk_qd_ac_60378_SG2M4U7T.yp4dfejf.work'},
+  {name:'xv',       qm:'https://cnbl0r.7bdn2t7.work',            qd:'https://tq_qd_3895604_T146L642.72iq4893.work'},
+  {name:'大老二',   qm:'https://9rqnr3.3fckbch.work',       qd:'https://dle_qd_389_J2DWLJL4.44ityrdz.work'},
   {name:'小h片',    qm:'https://xhp_qmnm_38122_188THOXU.1oo6f0bs.work',       qd:'https://xxhp_qd_ac_36932_R41P3BEC.gmsf7emt.work'},
-  {name:'小红书',   qm:'https://fbil8h.9p8nwgj.work',       qd:'https://jj_qd_ac_60378_ir9z3q8v.fnuth0h0.work'},
-  {name:'片多多',   qm:'https://fyhf4o.bx44sk5.work',                qd:'https://xmt_12_NW3U39TJ.mqe1rhsc.work'},
-  {name:'正能量',   qm:'https://rwddwt.u517sh6.work',                          qd:'https://znl_qd.u517sh6.work'},
-  {name:'母狗园',   qm:'https://rorvie.qdwe0pw.work',        qd:'https://aw_qd_38944_Z20IHAOR.4o2lcl7o.work'},
-  {name:'字母圈',   qm:'https://kxa5jb.4xu49u1.work',       qd:'https://zmq_qd_603_7PA4OILS.trw4h5rw.work'},
-  {name:'肉视频',   qm:'https://d271ny.2bp1wa9.work',        qd:'https://sf_qd_389_6AE1J275.59im0p6e.work'},
+  {name:'小红书',   qm:'https://7iyr8f.9p8nwgj.work',       qd:'https://jj_qd_ac_60378_ir9z3q8v.fnuth0h0.work'},
+  {name:'片多多',   qm:'https://whe4oe.bx44sk5.work',                qd:'https://xmt_12_NW3U39TJ.mqe1rhsc.work'},
+  {name:'正能量',   qm:'https://rc7fc7.u517sh6.work',                          qd:'https://znl_qd.u517sh6.work'},
+  {name:'母狗园',   qm:'https://3kj82w.qdwe0pw.work',        qd:'https://aw_qd_38944_Z20IHAOR.4o2lcl7o.work'},
+  {name:'字母圈',   qm:'https://apybj8.4xu49u1.work',       qd:'https://zmq_qd_603_7PA4OILS.trw4h5rw.work'},
+  {name:'肉视频',   qm:'https://1gh6o1.2bp1wa9.work',        qd:'https://sf_qd_389_6AE1J275.59im0p6e.work'},
   {name:'性癖',     qm:'https://xpsp0512.fbglw7pw.work',                       qd:'https://xpsp0512.4u6c5shv.work'},
   {name:'探探',     qm:'https://mg_ac_25745_4D3P6KD9.peelxvv2.work',      qd:'https://d18_qd_ac_60378_I208KCRB.6na3sfyg.work'},
-  {name:'推特',     qm:'https://vdapdr.a2bfzw3.work',     qd:'https://bk_qd_603_YAS89370.1x3kag7v.work'},
-  {name:'淫妻社',   qm:'https://gaoi3l.b0dcn9d.work',      qd:'https://yqs_qd_ac_60378_C5040F66.tmzfq70r.work'},
-  {name:'黄色仓库', qm:'https://cite5g.7ks3xsa.work',        qd:'https://hsck_qd_38944_PT7H2EY3.9y9bskpg.work'},
+  {name:'推特',     qm:'https://qg6c6z.a2bfzw3.work',     qd:'https://bk_qd_603_YAS89370.1x3kag7v.work'},
+  {name:'淫妻社',   qm:'https://eb5b2y.b0dcn9d.work',      qd:'https://yqs_qd_ac_60378_C5040F66.tmzfq70r.work'},
+  {name:'黄色仓库', qm:'https://uq46p0.7ks3xsa.work',        qd:'https://hsck_qd_38944_PT7H2EY3.9y9bskpg.work'},
   {name:'腾讯',     qm:'https://sh_qm_38122_33GXQG64.fe4jzx9u.work',          qd:'https://txws_qmnm_141124_kou19634.3v6stuyc.work'},
   {name:'蜜穴逼城', qm:'https://mxbc_qm_ac_36932_N0P1BP7N.g3wgv2pq.work',    qd:'https://mxqd_22_500J680N.dcqqaq2c.work'},
-  {name:'蜜桃',     qm:'https://icmu7z.aus4y7m.work',             qd:'https://lmt_53d_D320A97W.stb0ey1b.work'},
-  {name:'爆走黑料', qm:'https://ge8d8f.2n9aj1j.work',         qd:'https://hl_qd_ac_603_32YD130G.b1bvejff.work'},
-  {name:'草榴短',   qm:'https://4feagc.q6vv0mf.work',            qd:'https://cld_qd_38944_5772ON84.90oh12d5.work'},
-  {name:'N号房',    qm:'https://2c7xam.1h91yqi.work',       qd:'https://jj_qd_ac_60378_4P2G07VA.ohp5tyow.work'},
-  {name:'海角',     qm:'https://cvjgl3.qb63i4ej.work',        qd:'https://hj_qd_ac_60378_LC1KD7L8.7t3bp9u3.work'},
-  {name:'小黄游',   qm:'https://gc8c7z.1s2ryuv.work',                 qd:'https://xhy.6pigy9545.xyz'},
-  {name:'红番茄',   qm:'https://97sjx0.2h6vzqh.work',             qd:'https://hfq_qd_38944_F32B4T7W.7ln2y3rj.work'},
-  {name:'陌陌',     qm:'https://3qn1bp.1sza04v.work',      qd:'https://1v1_qd_ac_60378_2MF63622.b1q62a3p.work'},
-  {name:'男娘日记', qm:'https://h1p35l.wqibxk9.work',                        qd:'https://nnrj_1_Y20Y65NY.rbv3nza1.work'},
-  {name:'黄瓜社区', qm:'https://lkrtka.hjd6b38.work',        qd:'https://hgqd_261414_5ZFI3Z3X.hb5h8j9u.work'},
-  {name:'鸡鸡向上', qm:'https://6nd285.i1b166po.work',                        qd:'https://jjxs-qd.nidbh0q9.work'},
-  {name:'动漫岛',   qm:'https://mo0rxk.ahvd2h39.work',                         qd:'https://dmd-qd.vyxdr9o4.work'},
-  {name:'uu视频',   qm:'https://d0ontq.6c54kop.work',      qd:'https://spu_1712_s0iuzst0.s9sctt6g.work'},
-  {name:'热穴高校', qm:'https://vkem0f.0nmgcij7.work',        qd:'https://rxgx-qd.qxrzh75g.work'},
-  {name:'新鉴黄师', qm:'https://kcdurq.u6um7262.work',                         qd:'https://xjhs_qd_38122_4VRE735N.1r5uvw41.work'},
-  {name:'茶颜悦涩', qm:'https://7tvhm5.4rky6b4m.work',                          qd:'https://svz-qd.n4r545uc.work'},
+  {name:'蜜桃',     qm:'https://trgrdk.aus4y7m.work',             qd:'https://lmt_53d_D320A97W.stb0ey1b.work'},
+  {name:'爆走黑料', qm:'https://kmflw8.2n9aj1j.work',         qd:'https://hl_qd_ac_603_32YD130G.b1bvejff.work'},
+  {name:'草榴短',   qm:'https://2jpazr.q6vv0mf.work',            qd:'https://cld_qd_38944_5772ON84.90oh12d5.work'},
+  {name:'N号房',    qm:'https://0jgdd9.1h91yqi.work',       qd:'https://jj_qd_ac_60378_4P2G07VA.ohp5tyow.work'},
+  {name:'海角',     qm:'https://mdvbcr.qb63i4ej.work',        qd:'https://hj_qd_ac_60378_LC1KD7L8.7t3bp9u3.work'},
+  {name:'小黄游',   qm:'https://k4frcd.1s2ryuv.work',                 qd:'https://xhy.6pigy9545.xyz'},
+  {name:'红番茄',   qm:'https://fc6v4g.2h6vzqh.work',             qd:'https://hfq_qd_38944_F32B4T7W.7ln2y3rj.work'},
+  {name:'陌陌',     qm:'https://l0e56g.1sza04v.work',      qd:'https://1v1_qd_ac_60378_2MF63622.b1q62a3p.work'},
+  {name:'男娘日记', qm:'https://6jqycu.wqibxk9.work',                        qd:'https://nnrj_1_Y20Y65NY.rbv3nza1.work'},
+  {name:'黄瓜社区', qm:'https://nxfoa4.hjd6b38.work',        qd:'https://hgqd_261414_5ZFI3Z3X.hb5h8j9u.work'},
+  {name:'鸡鸡向上', qm:'https://xgazvi.i1b166po.work',                        qd:'https://jjxs-qd.nidbh0q9.work'},
+  {name:'动漫岛',   qm:'https://phymnk.ahvd2h39.work',                         qd:'https://dmd-qd.vyxdr9o4.work'},
+  {name:'uu视频',   qm:'https://4wcumm.6c54kop.work',      qd:'https://spu_1712_s0iuzst0.s9sctt6g.work'},
+  {name:'热穴高校', qm:'https://qz4l96.0nmgcij7.work',        qd:'https://rxgx-qd.qxrzh75g.work'},
+  {name:'新鉴黄师', qm:'https://ge12c9.u6um7262.work',                         qd:'https://xjhs_qd_38122_4VRE735N.1r5uvw41.work'},
+  {name:'茶颜悦涩', qm:'https://54iky5.4rky6b4m.work',                          qd:'https://svz-qd.n4r545uc.work'},
   {name:'91楼凤',   qm:'https://d3txnnx3zzop3v.cloudfront.net',       qd:'https://91lf_121_L8LOQ0OB.6ox7eqyj.work'},
-  {name:'爱熟',     qm:'https://dz3iti.927rhul.work',              qd:'https://snbs_2qd_F47U5MRB.er8ncy4p.work'},
-  {name:'蜜芽',     qm:'https://9nhsk4.obatfrnb.work',                           qd:'https://my-qd.200jheqw.work'},
+  {name:'爱熟',     qm:'https://08o5hf.927rhul.work',              qd:'https://snbs_2qd_F47U5MRB.er8ncy4p.work'},
+  {name:'蜜芽',     qm:'https://r7ucwc.obatfrnb.work',                           qd:'https://my-qd.200jheqw.work'},
   {name:'TK18禁',  qm:'https://tk18.ut90ynsb.work',                            qd:'https://tk18.bam26bkd.work'},
   {name:'爆走黑料pc端',qm:'https://pc_2_09TQ32JK.8nln0yg.work',               qd:'https://bzhl_29_623d1to6.8nln0yg.work'},
   {name:'爸爸上我',qm:'https://sw_38122_8e72nx4w.s4tmvc04.work',               qd:'https://ss_4729017_0bm81x49.jryh1wme.work'},
@@ -503,21 +510,21 @@ const mainData = [
 
 // OTHER_DATA_START
 const otherData = [
-  {name:'blibli',   qm:'https://50kyvf.cuimq5s.work',               qd:null},
-  {name:'顶通H漫',  qm:'https://gj41gu.a3ti87y.work',                qd:null},
+  {name:'blibli',   qm:'https://l1dfhn.cuimq5s.work',               qd:null},
+  {name:'顶通H漫',  qm:'https://2ymy2h.a3ti87y.work',                qd:null},
   {name:'MAMA我还要',qm:'https://dysp05.p6c171v.work',                          qd:'https://mmw_53qd__GVLE59YO.410prpar.work'},
-  {name:'瓜瓜社',   qm:'https://n9v0ai.ajlsqt0.work',        qd:null},
-  {name:'快看漫画', qm:'https://13shx9.385dvsl.work',             qd:null},
-  {name:'他他GV',   qm:'https://i2c635.andzkcy.work',          qd:null},
-  {name:'PornCn',   qm:'https://u69yat.0qyoolhc.work',                            qd:null},
-  {name:'P站',      qm:'https://6tq6yx.bimjutg.work',                          qd:null},
-  {name:'老色批',   qm:'https://snfidf.a72tqck.work',                qd:null},
-  {name:'LGBT',     qm:'https://rlgrql.d667s3q.work',             qd:null},
-  {name:'BiliBili', qm:'https://m9ubgp.1j16hgp.work',       qd:null},
-  {name:'女菩萨',   qm:'https://cjrvcl.3gwvvv0.work',         qd:null},
-  {name:'鉴黄师',   qm:'https://ghqs8k.7mwc05b.work',                  qd:null},
-  {name:'脸书成人', qm:'https://y7oomp.7ndikob.work',                      qd:null},
-  {name:'零元嫖',   qm:'https://h6rgl0.c2cr4id.work',         qd:null},
+  {name:'瓜瓜社',   qm:'https://pzewtl.ajlsqt0.work',        qd:null},
+  {name:'快看漫画', qm:'https://aerwfm.385dvsl.work',             qd:null},
+  {name:'他他GV',   qm:'https://w1ftds.andzkcy.work',          qd:null},
+  {name:'PornCn',   qm:'https://l5nmv3.0qyoolhc.work',                            qd:null},
+  {name:'P站',      qm:'https://a4j2tw.bimjutg.work',                          qd:null},
+  {name:'老色批',   qm:'https://yt4m1r.a72tqck.work',                qd:null},
+  {name:'LGBT',     qm:'https://957rgs.d667s3q.work',             qd:null},
+  {name:'BiliBili', qm:'https://rrnw7c.1j16hgp.work',       qd:null},
+  {name:'女菩萨',   qm:'https://q258gy.3gwvvv0.work',         qd:null},
+  {name:'鉴黄师',   qm:'https://m96hjz.7mwc05b.work',                  qd:null},
+  {name:'脸书成人', qm:'https://ilrndb.7ndikob.work',                      qd:null},
+  {name:'零元嫖',   qm:'https://1yn556.c2cr4id.work',         qd:null},
 ];
 // OTHER_DATA_END
 
@@ -686,8 +693,12 @@ const tgFollowups = [{"id": "tg-2026-06-28-叶若宁-88896", "text": "【叶若�
 // TG_FOLLOWUPS_END
 
 // COMPLAINT_DATA_START
-const complaintData = {"week": "2026-06-29 ～ 2026-07-05", "totalCount": 26, "totalAmount": 2370, "top3": [{"name": "AI引擎", "count": 4, "amount": 600, "issues": ["无理由退款", "莫名扣款", "色情软件"]}, {"name": "男娘日记", "count": 4, "amount": 400, "issues": ["无理由退款", "充值未到账", "虚假宣传"]}, {"name": "acfun", "count": 3, "amount": 110, "issues": ["无理由退款", "充值未到账", "莫名扣款"]}], "report": "【组别】\n四组-恒睿\n【本周总接线量】\n恒睿：\n逸品：\n【本周投诉总金额】\n恒睿：2370\n【本周投诉总笔数】\n恒睿：26\n【本周高频客诉问题TOP3】\n恒睿：\n1.本周用户付款后，仍有较多以非本人操作、误触付款或临时反悔为主的退款申请，说明无理由退款问题依旧较为集中，用户在付费决策和付款后的接受度上仍不够稳定。\n2.部分用户对产品内容性质、页面呈现及实际使用结果存在认知偏差，容易进一步转化为色情网站或体验不符类投诉，显示用户对产品内容与使用预期之间仍有一定落差。\n3.个别产品仍持续出现充值未到账及无法使用问题，说明在付款后到账反馈、功能稳定性及使用承接上仍有不足，用户对实际付费结果的感知不够明确。\n\n【典型用户反馈】\n恒睿：\n1.\n2.\n3.\n\n【本组业务黑榜TOP3】\n恒睿：\n1. 产品名称：AI引擎\n投诉金额：600\n投诉笔数：4\n主要问题：无理由退款、莫名扣款、色情软件\n2. 产品名称：男娘日记\n投诉金额：400\n投诉笔数：4\n主要问题：无理由退款、充值未到账、虚假宣传\n3. 产品名称：acfun\n投诉金额：110\n投诉笔数：3\n主要问题：无理由退款、充值未到账、莫名扣款\n\n【本周核心根因】\n1.AI引擎本周投诉问题主要集中在无理由退款、莫名扣款、色情软件，说明该产品在用户付款后的内容接受度、扣费感知及实际体验预期之间仍存在明显落差，导致用户在未感受到明确价值或对页面内容认知不足时，较容易直接转化为退款与负面投诉。\n2.男娘日记本周投诉主要围绕无理由退款、充值未到账、虚假宣传，反映出该产品除了付款后到账反馈不够稳定外，用户对内容呈现与实际体验之间也存在一定认知偏差，若未及时看到明确结果或实际体验不符预期，较容易进一步引发投诉。\n3.acfun本周投诉问题主要集中在无理由退款、充值未到账、莫名扣款，说明该产品在付款说明、到账反馈及用户付费后的确认感上仍有不足，容易让用户对实际扣费结果与权益开通情况产生疑虑，进而提高投诉与退款发生率。\n\n【本周整改动作】\n1.针对AI引擎本周高频出现的无理由退款、莫名扣款、色情软件问题，持续整理典型投诉样本、用户反馈内容及相关页面情况，协助业务侧进一步核查付款后内容承接、页面呈现及扣费说明是否存在断层。\n2.针对男娘日记和acfun两款本周投诉较集中的产品，优先关注用户付款后到账反馈、实际体验情况及扣费确认感受，尽量减少用户付款后无明显变化、到账异常或体验落差带来的投诉问题。\n3.针对无理由退款、莫名扣款及体验不符问题仍偏高的情况，持续补充高频产品的用户反馈内容、页面截图及异常订单资料，方便后续进行问题比对、订单复核及业务侧优化参考。\n\n【本周风险与Plan B】\n1.风险点：AI引擎本周投诉笔数最高，若无理由退款、莫名扣款问题未及时压降，后续投诉笔数仍有继续累积的可能。\nPlan B：持续重点追踪AI引擎投诉结构变化，优先关注用户付款后扣费感知、内容接受度及页面呈现问题，必要时单独整理高风险案例做专项复核。\n2.风险点：男娘日记本周投诉金额较高，若无理由退款、充值未到账问题未改善，后续投诉金额与用户负面感受仍可能继续升高。\nPlan B：优先核查男娘日记相关投诉内容，持续补看到账异常、内容认知落差及宣传体验差异问题，必要时提前整理异常样本供业务侧优化参考。\n3.风险点：acfun本周除无理由退款外，充值未到账与莫名扣款问题也较明显，若到账反馈与付款后确认感未改善，后续容易形成重复性投诉。\nPlan B：先针对acfun建立充值异常与扣费争议的持续追踪机制，重点确认到账回调、后台同步及前端展示是否一致，必要时同步整理异常订单做进一步核查。\n\n【其他需补充说明】\n无"};
+const complaintData = {"week": "2026-06-29 ～ 2026-07-05", "totalCount": 26, "totalAmount": 2370, "top3": [{"name": "AI引擎", "count": 4, "amount": 600, "issues": ["无理由退款", "莫名扣款", "色情软件"]}, {"name": "男娘日记", "count": 4, "amount": 400, "issues": ["无理由退款", "充值未到账", "虚假宣传"]}, {"name": "acfun", "count": 3, "amount": 110, "issues": ["无理由退款", "充值未到账", "莫名扣款"]}], "report": "【组别】\n四组-恒睿\n【本周总接线量】\n恒睿：846\n逸品：301\n【本周投诉总金额】\n恒睿：2370\n【本周投诉总笔数】\n恒睿：26\n【本周高频客诉问题TOP3】\n恒睿：\n1.本周用户付款后，仍有较多以非本人操作、误触付款或临时反悔为主的退款申请，说明无理由退款问题依旧较为集中，用户在付费决策和付款后的接受度上仍不够稳定。\n2.部分用户对产品内容性质、页面呈现及实际使用结果存在认知偏差，容易进一步转化为色情网站或体验不符类投诉，显示用户对产品内容与使用预期之间仍有一定落差。\n3.个别产品仍持续出现充值未到账及无法使用问题，说明在付款后到账反馈、功能稳定性及使用承接上仍有不足，用户对实际付费结果的感知不够明确。\n\n【典型用户反馈】\n恒睿：\n1.\n2.\n3.\n\n【本组业务黑榜TOP3】\n恒睿：\n1. 产品名称：AI引擎\n投诉金额：600\n投诉笔数：4\n主要问题：无理由退款、莫名扣款、色情软件\n2. 产品名称：男娘日记\n投诉金额：400\n投诉笔数：4\n主要问题：无理由退款、充值未到账、虚假宣传\n3. 产品名称：acfun\n投诉金额：110\n投诉笔数：3\n主要问题：无理由退款、充值未到账、莫名扣款\n\n【本周核心根因】\n1.AI引擎本周投诉问题主要集中在无理由退款、莫名扣款、色情软件，说明该产品在用户付款后的内容接受度、扣费感知及实际体验预期之间仍存在明显落差，导致用户在未感受到明确价值或对页面内容认知不足时，较容易直接转化为退款与负面投诉。\n2.男娘日记本周投诉主要围绕无理由退款、充值未到账、虚假宣传，反映出该产品除了付款后到账反馈不够稳定外，用户对内容呈现与实际体验之间也存在一定认知偏差，若未及时看到明确结果或实际体验不符预期，较容易进一步引发投诉。\n3.acfun本周投诉问题主要集中在无理由退款、充值未到账、莫名扣款，说明该产品在付款说明、到账反馈及用户付费后的确认感上仍有不足，容易让用户对实际扣费结果与权益开通情况产生疑虑，进而提高投诉与退款发生率。\n\n【本周整改动作】\n1.针对AI引擎本周高频出现的无理由退款、莫名扣款、色情软件问题，持续整理典型投诉样本、用户反馈内容及相关页面情况，协助业务侧进一步核查付款后内容承接、页面呈现及扣费说明是否存在断层。\n2.针对男娘日记和acfun两款本周投诉较集中的产品，优先关注用户付款后到账反馈、实际体验情况及扣费确认感受，尽量减少用户付款后无明显变化、到账异常或体验落差带来的投诉问题。\n3.针对无理由退款、莫名扣款及体验不符问题仍偏高的情况，持续补充高频产品的用户反馈内容、页面截图及异常订单资料，方便后续进行问题比对、订单复核及业务侧优化参考。\n\n【本周风险与Plan B】\n1.风险点：AI引擎本周投诉笔数最高，若无理由退款、莫名扣款问题未及时压降，后续投诉笔数仍有继续累积的可能。\nPlan B：持续重点追踪AI引擎投诉结构变化，优先关注用户付款后扣费感知、内容接受度及页面呈现问题，必要时单独整理高风险案例做专项复核。\n2.风险点：男娘日记本周投诉金额较高，若无理由退款、充值未到账问题未改善，后续投诉金额与用户负面感受仍可能继续升高。\nPlan B：优先核查男娘日记相关投诉内容，持续补看到账异常、内容认知落差及宣传体验差异问题，必要时提前整理异常样本供业务侧优化参考。\n3.风险点：acfun本周除无理由退款外，充值未到账与莫名扣款问题也较明显，若到账反馈与付款后确认感未改善，后续容易形成重复性投诉。\nPlan B：先针对acfun建立充值异常与扣费争议的持续追踪机制，重点确认到账回调、后台同步及前端展示是否一致，必要时同步整理异常订单做进一步核查。\n\n【其他需补充说明】\n无"};
 // COMPLAINT_DATA_END
+
+// PANEL_UPDATED_AT_START
+const panelUpdatedAt = "2026-06-30 09:12";
+// PANEL_UPDATED_AT_END
 
 // 逸品组: 站1(除7个) + 站3(7个)
 const yipinData = [
@@ -1365,6 +1376,13 @@ async function fetchComplaintData() {
   btn.disabled = false; btn.textContent = '获取数据';
 }
 renderEvalCards();
+
+// 填充所有区块的最后更新时间
+if (panelUpdatedAt) {
+  document.querySelectorAll('.section-update-time').forEach(el => {
+    el.textContent = '更新于 ' + panelUpdatedAt;
+  });
+}
 
 // ── 待跟进事项 ──
 let followupItems = [];
