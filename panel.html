@@ -271,6 +271,7 @@
       <div class="stat-card"><div class="stat-num">62</div><div class="stat-label">有效平台数</div></div>
       <div class="stat-card"><div class="stat-num" id="main-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
+    <div id="verify-alerts"></div>
     <div id="main-platforms"></div>
   </div>
 
@@ -721,6 +722,10 @@ function dispName(n){ return displayNames[n] || n; }
 // 固定 H5 链接（完整 URL、不拼随机前缀、不参与每日更新）
 const h5Full = { 'Niconico': 'https://niconicocn.com' };
 
+// VERIFY_ALERTS_START
+const verifyAlerts = {"date": "2026-07-03 07:23", "items": [{"name": "草榴短", "type": "全民", "info": "cl"}, {"name": "草榴短", "type": "渠道", "info": "cl"}, {"name": "蜜桃", "type": "全民", "info": "mt"}, {"name": "蜜桃", "type": "渠道", "info": "mt"}, {"name": "海角", "type": "全民", "info": "色逼哩"}, {"name": "海角", "type": "渠道", "info": "色逼哩"}, {"name": "acfan", "type": "全民", "info": "acfun"}, {"name": "acfan", "type": "渠道", "info": "acfun"}, {"name": "51乱伦", "type": "全民", "info": "母瘾社区"}, {"name": "51乱伦", "type": "渠道", "info": "母瘾社区"}, {"name": "热穴高校", "type": "全民", "info": "热血高校"}, {"name": "热穴高校", "type": "渠道", "info": "热血高校"}, {"name": "动漫岛", "type": "全民", "info": "?"}, {"name": "动漫岛", "type": "渠道", "info": "?"}, {"name": "新鉴黄师", "type": "全民", "info": "鉴黄师"}, {"name": "新鉴黄师", "type": "渠道", "info": "鉴黄师"}]};
+// VERIFY_ALERTS_END
+
 let linkOverrides = {};  // { platform: { qm|qd|h5: url } }  来自 Supabase link_overrides 表
 function ovr(name, type, url){ return (linkOverrides[name] && linkOverrides[name][type]) || url; }
 
@@ -758,6 +763,19 @@ function renderMain(){
     allData.reduce((s, p) => s + (ovr(p.name,'qm',p.qm) ? 1 : 0) + (ovr(p.name,'qd',p.qd) ? 1 : 0) + (h5Suffixes[p.name] ? 1 : 0), 0);
 }
 renderMain();
+
+// 校验提醒栏：列出「链接已更新、但页面标题与平台名不符」的平台，供人工抽查
+function renderVerifyAlerts(){
+  const el = document.getElementById('verify-alerts');
+  if(!el) return;
+  const items = (typeof verifyAlerts !== 'undefined' && verifyAlerts.items) || [];
+  if(!items.length){ el.innerHTML = ''; return; }
+  el.innerHTML = `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#9a3412;line-height:1.7;">
+    ⚠️ <b>链接校验提醒</b> <span style="color:#c2792c;">（${verifyAlerts.date||''}）</span>：以下 <b>${items.length}</b> 条链接已照常更新，但页面标题与平台名不符，请抽查是否为正确平台（不符可用「编辑」改正）：
+    <div style="margin-top:6px;">${items.map(i=>`<span style="display:inline-block;background:#fff;border:1px solid #fed7aa;border-radius:4px;padding:1px 6px;margin:2px 4px 2px 0;">${dispName(i.name)}·${i.type} <span style="color:#b45309;">页面:${i.info||'?'}</span></span>`).join('')}</div>
+  </div>`;
+}
+renderVerifyAlerts();
 
 // ── 链接手动覆盖：读写 Supabase link_overrides 表 ──
 const _OVR_URL = 'https://kjfglthwocbzinkiyfxm.supabase.co';
