@@ -699,6 +699,7 @@ const displayNames = {
   "瓜瓜社": "瓜瓜社/呱呱社(瓜瓜社)",
   "他他GV": "翻咔视频(他他GV)",
   "P站": "PornHub(P站)",
+  "小h片": "小黄片(新、小h片)",
   "老色批": "老色批(淫母巴士、爱壹帆、湿瓜视频)",
   "LGBT": "LGBT(他他射区)",
   "BiliBili": "流光禁漫(有妖气、91涩漫、bilibili禁漫)",
@@ -1071,31 +1072,68 @@ async function doUploadHengrui() {
   log(`标签页: ${sheet}`);
   const dVals = await readRange(token, HENGRUI_ID, `${sheet}!D2:D300`);
   const hVals = await readRange(token, HENGRUI_ID, `${sheet}!H2:H300`);
-  const nameMap = {};
-  for(const p of [...mainData,...otherData])
-    nameMap[p.name.trim().toLowerCase()] = p;
+  // 每个平台的可匹配名称：主名(displayNames) + 别名 + 短名
+  const platNames = [];
+  for(const p of [...mainData,...otherData]){
+    const full = (typeof displayNames!=='undefined' && displayNames[p.name]) || p.name;
+    const mm = full.match(/^(.*?)[（(]([^）)]*)[）)]\s*$/);
+    const primary = mm ? mm[1].trim() : full;
+    const names = new Set([p.name, primary]);
+    if(mm) mm[2].split(/[、,，]/).forEach(a=>{const t=a.trim(); if(t) names.add(t);});
+    platNames.push({p, primary, names:[...names].filter(n=>n.length>=2)});
+  }
+  function cellPrimary(cell){
+    const line = (cell.split('\n').map(s=>s.trim()).filter(Boolean)[0])||'';
+    const m = line.match(/^(.*?)[（(]/);
+    return (m ? m[1].trim() : line.trim());
+  }
+  // 先按"格子主名==平台主名/短名"精确配（避免别名撞车，如「小黄片(新)」误配到91视频）；
+  // 配不到再退回"单格内含任一名称"（例：色哔哩(海角、91乱伦) 含「海角」→ 海角）
+  function matchCell(cell){
+    const prim = cellPrimary(cell);
+    if(prim){
+      for(const {p,primary} of platNames)
+        if(prim===primary || prim===p.name) return p;
+    }
+    for(const {p,names} of platNames)
+      for(const n of names)
+        if(cell.includes(n)) return p;
+    return null;
+  }
+
   const updates = [];
-  let matched=0, skip=0;
+  let matched=0;
+  const unmatched=[];
+  // D列平台 → E(下载/落地页=全民) F(渠道)。遇到「苹果H5网页版」分块就停，别覆盖那块
   for(let i=0;i<dVals.length;i++){
-    const nm = (dVals[i]?.[0]||'').trim();
-    if(!nm) continue;
-    const p = nameMap[nm.toLowerCase()];
+    const cell=(dVals[i]?.[0]||'').trim();
+    if(!cell) continue;
+    if(cell.includes('苹果H5')) break;
+    const p = matchCell(cell);
     if(p){
       const row=i+2;
       if(p.qm) updates.push({range:`${sheet}!E${row}`,values:[[p.qm]]});
       if(p.qd) updates.push({range:`${sheet}!F${row}`,values:[[p.qd]]});
       matched++;
-    } else { skip++; }
-  }
-  for(let i=0;i<hVals.length;i++){
-    const nm = (hVals[i]?.[0]||'').trim();
-    if(!nm) continue;
-    const suffix = h5Suffixes[nm]||h5Suffixes[nm.toLowerCase()];
-    if(suffix){
-      updates.push({range:`${sheet}!I${i+2}`,values:[[`https://${rand6()}.${suffix}`]]});
+    } else {
+      unmatched.push(cell.split('\n')[0].trim());
     }
   }
-  log(`匹配 ${matched} 个平台，跳过 ${skip} 个，写入 ${updates.length} 格...`);
+  // H列平台 → I(H5链接)
+  for(let i=0;i<hVals.length;i++){
+    const cell=(hVals[i]?.[0]||'').trim();
+    if(!cell) continue;
+    if(cell.includes('苹果H5')) break;
+    const p = matchCell(cell);
+    if(p){
+      const suffix = h5Suffixes[p.name];
+      if(suffix) updates.push({range:`${sheet}!I${i+2}`,values:[[`https://${rand6()}.${suffix}`]]});
+    }
+  }
+  log(`匹配 ${matched} 个平台，写入 ${updates.length} 格...`);
+  if(unmatched.length){
+    log(`⚠️ 面板里没有、未上传的 ${unmatched.length} 个（请你确认）：${unmatched.join('、')}`,'log-err');
+  }
   if(!updates.length){ log('无可写入数据','log-err'); return; }
   const res = await batchWrite(token, HENGRUI_ID, updates);
   if(res.error) throw new Error(res.error.message);
