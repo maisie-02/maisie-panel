@@ -662,6 +662,52 @@ function rand6() {
   return s;
 }
 
+// 显示名映射：内部 name 键保持不变（脚本/h5Suffixes/rechargeData 都靠它），只改面板显示
+const displayNames = {
+  "91视频": "91视频(小黄片)",
+  "91重口": "重口社(窥视tv、91重口)",
+  "51动漫": "51动漫(萝莉社、次元姬)",
+  "51吃瓜": "第一毛片(听泉鉴逼、51吃瓜、甄选黑料)",
+  "51乱伦": "母瘾射区/母瘾社区(51乱伦)",
+  "acfan": "ACFAN",
+  "soul": "咪咪视频(soul成人、soul)",
+  "xv": "XVIDEO(糖心+、性视界、xv)",
+  "母狗园": "ONE一个(暗网、母狗园)",
+  "字母圈": "字母圈(色花堂、91淫母)",
+  "肉视频": "肉视频(私房、小师妹)",
+  "性癖": "性癖视频(性癖)",
+  "探探": "探探短视频(成人快手、探探)",
+  "淫妻社": "糖妻(淫妻社、恶魔影视)",
+  "黄色仓库": "黄色仓库(51猎奇、B老湿、猎奇小屋)",
+  "腾讯": "腾讯微视(69视频、Porn色盒、免费色盒、腾讯)",
+  "蜜穴逼城": "蜜穴逼城(萝莉禁区、淫荡猫、金三角揭秘)",
+  "蜜桃": "蜜桃视频(蜜桃)",
+  "爆走黑料": "暴走黑料(爆走黑料)",
+  "草榴短": "草榴短视频(草榴短)",
+  "N号房": "N号房(尖叫)",
+  "海角": "色哔哩(海角、91乱伦)",
+  "红番茄": "白嫖之家(红番茄)",
+  "uu视频": "懂色帝(UU视频)",
+  "茶颜悦涩": "少女镇(茶颜悦涩)",
+  "91楼凤": "91楼凤(花间堂、品茶阁)",
+  "爱熟": "MS.爱熟(熟女巴士、爱熟)",
+  "蜜芽": "蜜芽vlog(蜜芽)",
+  "爆走黑料pc端": "暴走黑料pc端(爆走黑料pc端)",
+  "爸爸上我": "爸爸上我(大湿兄、知音视频)",
+  "潘多拉": "潘多拉(有料盒子)",
+  "MAMA我还要": "妈妈我还要(MAMA我还要)",
+  "瓜瓜社": "瓜瓜社/呱呱社(瓜瓜社)",
+  "他他GV": "翻咔视频(他他GV)",
+  "P站": "PornHub(P站)",
+  "老色批": "老色批(淫母巴士、爱壹帆、湿瓜视频)",
+  "LGBT": "LGBT(他他射区)",
+  "BiliBili": "流光禁漫(有妖气、91涩漫、bilibili禁漫)",
+  "女菩萨": "女菩萨(新草榴视频)",
+  "鉴黄师": "鉴黄师(哔站)",
+  "脸书成人": "脸书成人版(UC网盘、脸书成人)"
+};
+function dispName(n){ return displayNames[n] || n; }
+
 function makeRow(url, type) {
   const label = type === 'qm' ? '全民代理' : type === 'qd' ? '渠道代理' : 'H5链接';
   return `<li class="domain-item">
@@ -680,7 +726,7 @@ function makeCard(p) {
   if (h5url) rows += makeRow(h5url, 'h5');
   const count = (p.qm ? 1 : 0) + (p.qd ? 1 : 0) + (h5url ? 1 : 0);
   return `<div class="platform-card">
-    <div class="platform-name">${p.name} <span class="badge ok">✓ ${count}条</span></div>
+    <div class="platform-name">${dispName(p.name)} <span class="badge ok">✓ ${count}条</span></div>
     <ul class="domain-list">${rows}</ul>
   </div>`;
 }
