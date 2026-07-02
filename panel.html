@@ -708,23 +708,30 @@ const displayNames = {
 };
 function dispName(n){ return displayNames[n] || n; }
 
-function makeRow(url, type) {
+let linkOverrides = {};  // { platform: { qm|qd|h5: url } }  来自 Supabase link_overrides 表
+function ovr(name, type, url){ return (linkOverrides[name] && linkOverrides[name][type]) || url; }
+
+function makeRow(url, type, platform) {
   const label = type === 'qm' ? '全民代理' : type === 'qd' ? '渠道代理' : 'H5链接';
+  const edited = !!(linkOverrides[platform] && linkOverrides[platform][type]);
   return `<li class="domain-item">
     <span class="type-tag ${type}">${label}</span>
-    <span class="domain-url"><a href="${url}" target="_blank">${url}</a></span>
+    <span class="domain-url"><a href="${url}" target="_blank">${url}</a>${edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : ''}</span>
     <button class="copy-btn" onclick="copyUrl('${url}')">复制</button>
+    <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${platform}','${type}')">编辑</button>
   </li>`;
 }
 
 function makeCard(p) {
+  const qm = ovr(p.name, 'qm', p.qm);
+  const qd = ovr(p.name, 'qd', p.qd);
   let rows = '';
-  if (p.qm) rows += makeRow(p.qm, 'qm');
-  if (p.qd) rows += makeRow(p.qd, 'qd');
+  if (qm) rows += makeRow(qm, 'qm', p.name);
+  if (qd) rows += makeRow(qd, 'qd', p.name);
   const suffix = h5Suffixes[p.name];
-  const h5url = suffix ? `https://${rand6()}.${suffix}` : null;
-  if (h5url) rows += makeRow(h5url, 'h5');
-  const count = (p.qm ? 1 : 0) + (p.qd ? 1 : 0) + (h5url ? 1 : 0);
+  const h5url = ovr(p.name, 'h5', suffix ? `https://${rand6()}.${suffix}` : null);
+  if (h5url) rows += makeRow(h5url, 'h5', p.name);
+  const count = (qm ? 1 : 0) + (qd ? 1 : 0) + (h5url ? 1 : 0);
   return `<div class="platform-card">
     <div class="platform-name">${dispName(p.name)} <span class="badge ok">✓ ${count}条</span></div>
     <ul class="domain-list">${rows}</ul>
@@ -732,9 +739,49 @@ function makeCard(p) {
 }
 
 const allData = [...mainData, ...otherData];
-document.getElementById('main-platforms').innerHTML = allData.map(makeCard).join('');
-document.getElementById('main-link-count').textContent =
-  allData.reduce((s, p) => s + (p.qm ? 1 : 0) + (p.qd ? 1 : 0) + (h5Suffixes[p.name] ? 1 : 0), 0);
+function renderMain(){
+  document.getElementById('main-platforms').innerHTML = allData.map(makeCard).join('');
+  document.getElementById('main-link-count').textContent =
+    allData.reduce((s, p) => s + (ovr(p.name,'qm',p.qm) ? 1 : 0) + (ovr(p.name,'qd',p.qd) ? 1 : 0) + (h5Suffixes[p.name] ? 1 : 0), 0);
+}
+renderMain();
+
+// ── 链接手动覆盖：读写 Supabase link_overrides 表 ──
+const _OVR_URL = 'https://kjfglthwocbzinkiyfxm.supabase.co';
+const _OVR_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZmdsdGh3b2Niemlua2l5ZnhtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjcwMDQ4MywiZXhwIjoyMDk4Mjc2NDgzfQ.DflCxDTmFocH5e0_JiDv82dxGWeEX1cnWtj8hUqwOTI';
+let _sbo = null;
+try { if (window.supabase) _sbo = supabase.createClient(_OVR_URL, _OVR_KEY); } catch(e) {}
+
+async function loadOverrides(){
+  if (!_sbo) return;
+  try {
+    const { data, error } = await _sbo.from('link_overrides').select('platform,type,url');
+    if (error) { console.warn('overrides load:', error.message); return; }
+    linkOverrides = {};
+    (data || []).forEach(r => { (linkOverrides[r.platform] = linkOverrides[r.platform] || {})[r.type] = r.url; });
+    renderMain();
+  } catch(e) { console.warn(e); }
+}
+window.editLink = async function(platform, type){
+  const cur = (linkOverrides[platform] && linkOverrides[platform][type]) || '';
+  const label = type === 'qm' ? '全民代理' : type === 'qd' ? '渠道代理' : 'H5链接';
+  const url = prompt(`修改「${dispName(platform)}」的${label}链接：\n（留空并确定 = 清除手改、恢复自动抓取）`, cur);
+  if (url === null) return;
+  if (!_sbo) { alert('未连接数据库，无法保存'); return; }
+  try {
+    if (url.trim() === '') {
+      await _sbo.from('link_overrides').delete().eq('platform', platform).eq('type', type);
+      if (linkOverrides[platform]) delete linkOverrides[platform][type];
+    } else {
+      await _sbo.from('link_overrides').upsert(
+        { platform, type, url: url.trim(), updated_at: new Date().toISOString() },
+        { onConflict: 'platform,type' });
+      (linkOverrides[platform] = linkOverrides[platform] || {})[type] = url.trim();
+    }
+    renderMain();
+  } catch(e) { alert('保存失败：' + e.message); }
+};
+loadOverrides();
 
 document.getElementById('other-platforms').innerHTML =
   '<div style="color:#6b7280;font-size:13px;padding:20px 0">其余平台已合并至「各平台最新下载链接」</div>';
