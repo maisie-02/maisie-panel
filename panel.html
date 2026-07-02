@@ -564,7 +564,7 @@ const mainData = [
   {name:'潘多拉',  qm:'https://pdl_ldy_924.sfyfypb3.work',                     qd:'https://pdl_qd12_0GT4SK42.32luxxss.work'},
   {name:'AI引擎',   qm:'https://aiyq_qm_25745_JZ7TT0XQ.n4wifr8e.work',   qd:'https://aiyq_qd_ac_60378_TW46VY3Q.6nvpolcm.work'},
   {name:'爱妻艺',   qm:'https://aiqiyi.fv7ppsy3.work',   qd:'https://qiyi_1219_m22ka9zh.fv7ppsy3.work'},
-  {name:'Niconico',qm:'https://ai_12qm_1EU9RUUB.a565utan.work',   qd:'https://ai_53qd__89SN3VP3.gf26doa7.work'},
+  {name:'Niconico',qm:'https://niconicocn.com',   qd:null},
   {name:'狂飙影库', qm:'https://kbyy_qm_6243890_NG13EQ46.lkdefv3x.work',   qd:'https://kbqd_22_07W3UV49.ucrui4uc.work'},
   {name:'懦弱妈妈', qm:'https://nrmm_qm_25745_0B6M3CQO.e82od51y.work',   qd:'https://nrmm_qd_ac_60378_TI29ZHM7.3pfzxhas.work'},
 ];
@@ -718,6 +718,9 @@ const displayNames = {
 };
 function dispName(n){ return displayNames[n] || n; }
 
+// 固定 H5 链接（完整 URL、不拼随机前缀、不参与每日更新）
+const h5Full = { 'Niconico': 'https://niconicocn.com' };
+
 let linkOverrides = {};  // { platform: { qm|qd|h5: url } }  来自 Supabase link_overrides 表
 function ovr(name, type, url){ return (linkOverrides[name] && linkOverrides[name][type]) || url; }
 
@@ -739,7 +742,7 @@ function makeCard(p) {
   if (qm) rows += makeRow(qm, 'qm', p.name);
   if (qd) rows += makeRow(qd, 'qd', p.name);
   const suffix = h5Suffixes[p.name];
-  const h5url = ovr(p.name, 'h5', suffix ? `https://${rand6()}.${suffix}` : null);
+  const h5url = ovr(p.name, 'h5', h5Full[p.name] || (suffix ? `https://${rand6()}.${suffix}` : null));
   if (h5url) rows += makeRow(h5url, 'h5', p.name);
   const count = (qm ? 1 : 0) + (qd ? 1 : 0) + (h5url ? 1 : 0);
   return `<div class="platform-card">
