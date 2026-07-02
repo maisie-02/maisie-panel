@@ -562,6 +562,11 @@ const mainData = [
   {name:'爆走黑料pc端',qm:'https://pc_2_09TQ32JK.8nln0yg.work',               qd:'https://bzhl_29_623d1to6.8nln0yg.work'},
   {name:'爸爸上我',qm:'https://sw_38122_8e72nx4w.s4tmvc04.work',               qd:'https://ss_4729017_0bm81x49.jryh1wme.work'},
   {name:'潘多拉',  qm:'https://pdl_ldy_924.sfyfypb3.work',                     qd:'https://pdl_qd12_0GT4SK42.32luxxss.work'},
+  {name:'AI引擎',   qm:'https://aiyq_qm_25745_JZ7TT0XQ.n4wifr8e.work',   qd:'https://aiyq_qd_ac_60378_TW46VY3Q.6nvpolcm.work'},
+  {name:'爱妻艺',   qm:'https://aiqiyi.fv7ppsy3.work',   qd:'https://qiyi_1219_m22ka9zh.fv7ppsy3.work'},
+  {name:'Niconico',qm:'https://ai_12qm_1EU9RUUB.a565utan.work',   qd:'https://ai_53qd__89SN3VP3.gf26doa7.work'},
+  {name:'狂飙影库', qm:'https://kbyy_qm_6243890_NG13EQ46.lkdefv3x.work',   qd:'https://kbqd_22_07W3UV49.ucrui4uc.work'},
+  {name:'懦弱妈妈', qm:'https://nrmm_qm_25745_0B6M3CQO.e82od51y.work',   qd:'https://nrmm_qd_ac_60378_TI29ZHM7.3pfzxhas.work'},
 ];
 // MAIN_DATA_END
 
@@ -590,6 +595,10 @@ const noDomainOther = [];
 // H5_SUFFIXES_START
 // H5 domain suffixes (test.XXXX.work → replace test with random 6-char alphanumeric)
 const h5Suffixes = {
+  'AI引擎':'yf0689xk.work',
+  '懦弱妈妈':'ci30xhrz.work',
+  '爱妻艺':'ckczkfqp.work',
+  '狂飙影库':'m47adfr4.work',
   '91视频':'ihrkbod.work',
   '91重口':'iego63x.work',
   '51动漫':'mgh3hyo.work',
@@ -914,13 +923,8 @@ function toggleGroup(name) {
 
 // AI_DATA_START
 // AI引擎
-const aiData = [
-  {name:'AI引擎',    dl:'c6r179gi.work', h5:'yf0689xk.work'},
-  {name:'懦弱妈妈',    dl:'wxdisgnr.work', h5:'ci30xhrz.work'},
-  {name:'爱妻艺',     dl:null, h5:'ckczkfqp.work'},
-  {name:'Niconico',dl:null, h5:null},
-  {name:'狂飙影库',    dl:'wtlsjlm4.work', h5:'m47adfr4.work'},
-];
+// AI 平台已并入 mainData（恒睿列表），此处置空、不再单独显示
+const aiData = [];
 // AI_DATA_END
 function makeAiCard(p) {
   let rows = '';
