@@ -1167,10 +1167,51 @@ async function doUploadYipin() {
   log(`✅ 完成！已更新 ${res.totalUpdatedCells} 个单元格`, 'log-ok');
 }
 
+async function doUploadAi() {
+  log('获取授权...');
+  const token = await getToken();
+  log('读取表格结构...');
+  const sheet = await getSheetName(token, HENGRUI_ID, HENGRUI_GID);  // AI 平台在恒睿同一张表
+  if(!sheet) throw new Error('找不到标签页 gid='+HENGRUI_GID);
+  log(`标签页: ${sheet}`);
+  const dVals = await readRange(token, HENGRUI_ID, `${sheet}!D2:D300`);
+  const hVals = await readRange(token, HENGRUI_ID, `${sheet}!H2:H300`);
+  // 在某列里找"单格含平台名"的行（遇「苹果H5网页版」分块就停）
+  function findRow(vals, name){
+    for(let i=0;i<vals.length;i++){
+      const cell=(vals[i]?.[0]||'').trim();
+      if(!cell) continue;
+      if(cell.includes('苹果H5')) break;
+      if(cell.includes(name)) return i+2;
+    }
+    return -1;
+  }
+  const updates=[]; let matched=0; const notFound=[];
+  for(const p of aiData){
+    if(!p.dl && !p.h5) continue;   // 无链接跳过（如 Niconico）
+    let hit=false;
+    if(p.dl){  // 落地页 → E
+      const r=findRow(dVals, p.name);
+      if(r>0){ updates.push({range:`${sheet}!E${r}`,values:[[`https://${rand6()}.${p.dl}`]]}); hit=true; }
+    }
+    if(p.h5){  // H5 → I
+      const r=findRow(hVals, p.name);
+      if(r>0){ updates.push({range:`${sheet}!I${r}`,values:[[`https://${rand6()}.${p.h5}`]]}); hit=true; }
+    }
+    if(hit) matched++; else notFound.push(p.name);
+  }
+  log(`匹配 ${matched} 个 AI 平台，写入 ${updates.length} 格（E=落地页 I=H5）...`);
+  if(notFound.length) log(`⚠️ 有链接但表单里找不到对应行（请你确认）：${notFound.join('、')}`,'log-err');
+  if(!updates.length){ log('无可写入数据','log-err'); return; }
+  const res = await batchWrite(token, HENGRUI_ID, updates);
+  if(res.error) throw new Error(res.error.message);
+  log(`✅ 完成！已更新 ${res.totalUpdatedCells} 个单元格`, 'log-ok');
+}
+
 const TAB_DESC = {
-  hengrui: '上传至恒睿表单：D列平台名称 → E(全民代理) F(渠道代理) H列 → I(H5链接)',
+  hengrui: '上传至恒睿表单：D列平台名称 → E(下载/落地页) F(渠道代理) H列 → I(H5链接)',
   yipin:   '上传至逸品表单：O列平台名称 → Q列(下载链接)，仅更新已存在的平台',
-  ai:      'AI引擎表单暂未配置'
+  ai:      '上传 AI引擎（恒睿同表）：落地页 → E列，H5 → I列（单格含平台名即匹配）'
 };
 
 function switchTab(tab) {
@@ -1179,7 +1220,7 @@ function switchTab(tab) {
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('uploadDesc').textContent = TAB_DESC[tab]||'';
   document.getElementById('uploadLog').innerHTML = '<span style="color:#4b5563">等待上传...</span>';
-  document.getElementById('btnStart').disabled = (tab==='ai');
+  document.getElementById('btnStart').disabled = false;
 }
 
 function openUpload(tab) {
@@ -1196,6 +1237,7 @@ async function startUpload() {
   try {
     if(_activeTab==='hengrui') await doUploadHengrui();
     else if(_activeTab==='yipin') await doUploadYipin();
+    else if(_activeTab==='ai') await doUploadAi();
   } catch(e) {
     log('❌ 错误: '+e.message, 'log-err');
   }
