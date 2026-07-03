@@ -1178,19 +1178,27 @@ async function doUploadYipin() {
   if(!sheet) throw new Error('找不到逸品标签页 gid='+YIPIN_GID);
   log(`标签页: ${sheet}`);
   const oVals = await readRange(token, YIPIN_ID, `${sheet}!O3:O300`);
-  const allYipin = [...yipinData,...yipin2Data];
-  const dlMap = {};
-  for(const p of allYipin) dlMap[p.name.trim().toLowerCase()] = p.dl;
-  const updates = [];
-  let matched=0, skip=0;
-  for(let i=0;i<oVals.length;i++){
-    const nm = (oVals[i]?.[0]||'').trim();
-    if(!nm) continue;
-    const dl = dlMap[nm.toLowerCase()];
-    if(dl){ updates.push({range:`${sheet}!Q${i+3}`,values:[[dl]]}); matched++; }
-    else skip++;
+  const allYipin = [...yipinData,...yipin2Data].filter(p=>p.name && p.dl);
+  // 好妻网 O 列常是「别名A/别名B/…」，只要格子里含面板平台名即匹配
+  function matchCell(cell){
+    const parts = cell.split(/[/／]/).map(s=>s.trim().toLowerCase()).filter(Boolean);
+    const cl = cell.toLowerCase();
+    for(const p of allYipin){
+      const n = p.name.trim().toLowerCase();
+      if(n.length>=2 && (parts.includes(n) || cl.includes(n))) return p;
+    }
+    return null;
   }
-  log(`匹配 ${matched} 个，跳过 ${skip} 个...`);
+  const updates=[]; let matched=0; const unmatched=[];
+  for(let i=0;i<oVals.length;i++){
+    const cell=(oVals[i]?.[0]||'').trim();
+    if(!cell) continue;
+    const p = matchCell(cell);
+    if(p){ updates.push({range:`${sheet}!Q${i+3}`,values:[[p.dl]]}); matched++; }
+    else unmatched.push(cell.split(/[/／]/)[0]);
+  }
+  log(`匹配 ${matched} 个，写入 ${updates.length} 格...`);
+  if(unmatched.length) log(`⚠️ 未匹配 ${unmatched.length} 个（表单用别名/面板无此平台）：${unmatched.join('、')}`,'log-err');
   if(!updates.length){ log('无可写入数据','log-err'); return; }
   const res = await batchWrite(token, YIPIN_ID, updates);
   if(res.error) throw new Error(res.error.message);
