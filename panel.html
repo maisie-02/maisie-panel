@@ -1681,6 +1681,7 @@ function renderRecharge(tab, entries) {
     el.innerHTML = '<div class="recharge-no-data">未找到该平台的充值资料</div>';
     return;
   }
+  window._rcards = [];
   el.innerHTML = entries.map(([name, data]) => {
     const showVip   = tab === 'all' || tab === 'vip';
     const showCoins = tab === 'all' || tab === 'coins';
@@ -1700,7 +1701,21 @@ function renderRecharge(tab, entries) {
           <td><span class="recharge-original">原价${v.original}元</span></td>
           <td style="color:var(--text-secondary)">${v.desc || '—'}</td>
         </tr>`).join('')}
-      </table>`;
+      </table>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin:10px 0 4px;">
+        ${data.vip.map(v => {
+          const idx = window._rcards.push(Object.assign({}, v, {platform:name})) - 1;
+          return `<div onclick="showCard(${idx})" title="点击查看全部权益"
+            style="cursor:pointer;width:150px;border:1px solid var(--card-border);border-radius:10px;padding:10px;background:var(--card-bg);text-align:center;transition:.15s;"
+            onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--card-border)'">
+            ${v.img
+              ? `<img src="${v.img}" style="width:100%;height:84px;object-fit:cover;border-radius:8px;">`
+              : `<div style="height:84px;display:flex;align-items:center;justify-content:center;border:1px dashed var(--card-border);border-radius:8px;color:var(--text-muted);font-size:12px;">🎫 图筐</div>`}
+            <div style="margin-top:8px;font-weight:600;font-size:13px;color:var(--text-primary);">${v.name}</div>
+            <div style="color:var(--accent);font-weight:700;font-size:13px;margin-top:2px;">¥${v.price}元</div>
+          </div>`;
+        }).join('')}
+      </div>`;
     }
 
     if (showCoins && data.coins && data.coins.length) {
@@ -1723,6 +1738,38 @@ function renderRecharge(tab, entries) {
     return html;
   }).join('');
 }
+
+// 点击会员卡区块 → 弹窗显示该卡全部权益
+window.showCard = function(i){
+  const v = window._rcards && window._rcards[i];
+  if(!v) return;
+  const benefits = (Array.isArray(v.benefits) && v.benefits.length) ? v.benefits : (v.desc ? [v.desc] : []);
+  let m = document.getElementById('cardModal');
+  if(!m){
+    m = document.createElement('div'); m.id='cardModal';
+    m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:9999;';
+    m.onclick=e=>{ if(e.target===m) m.style.display='none'; };
+    m.innerHTML='<div id="cardModalBox" style="background:var(--card-bg,#fff);color:var(--text-primary,#111);border-radius:12px;max-width:420px;width:90%;max-height:80vh;overflow:auto;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.3);"></div>';
+    document.body.appendChild(m);
+  }
+  m.querySelector('#cardModalBox').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div style="font-size:17px;font-weight:700;">${v.name}</div>
+      <span onclick="document.getElementById('cardModal').style.display='none'" style="cursor:pointer;color:var(--text-muted,#888);font-size:22px;line-height:1;">×</span>
+    </div>
+    <div style="color:var(--text-muted,#888);font-size:12px;margin:2px 0 12px;">${v.platform||''}</div>
+    ${v.img ? `<img src="${v.img}" style="width:100%;border-radius:8px;margin-bottom:12px;">` : ''}
+    <div style="display:flex;gap:20px;margin-bottom:14px;">
+      <div><div style="font-size:12px;color:var(--text-muted,#888);">售价</div><div style="font-size:18px;font-weight:700;color:var(--accent,#2b8a6f);">¥${v.price}元</div></div>
+      <div><div style="font-size:12px;color:var(--text-muted,#888);">原价</div><div style="font-size:15px;text-decoration:line-through;color:var(--text-muted,#888);">¥${v.original}元</div></div>
+    </div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:6px;">会员权益</div>
+    ${benefits.length
+      ? `<ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.9;">${benefits.map(b=>`<li>${b}</li>`).join('')}</ul>`
+      : `<div style="color:var(--text-muted,#888);font-size:13px;">（暂无权益说明，待从 H5 补充）</div>`}
+  `;
+  m.style.display='flex';
+};
 
 // 填充所有区块的最后更新时间
 if (panelUpdatedAt) {
