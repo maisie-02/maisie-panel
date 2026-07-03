@@ -1179,13 +1179,22 @@ async function doUploadYipin() {
   log(`标签页: ${sheet}`);
   const oVals = await readRange(token, YIPIN_ID, `${sheet}!O3:O300`);
   const allYipin = [...yipinData,...yipin2Data].filter(p=>p.name && p.dl);
-  // 好妻网 O 列常是「别名A/别名B/…」，只要格子里含面板平台名即匹配
+  // 好妻网 O 列的别名 → 面板平台名（补齐格式差异）
+  const YIPIN_ALIAS = {
+    'Pornhub': ['ph'], 'TikTok': ['tt'], 'Redgift': ['rg'],
+    'deepseek成人版': ['deepseek','成人deepseek'], '好莱坞': ['好莱污'],
+  };
+  // 好妻网 O 列常是「别名A/别名B/…」，格子里含面板平台名即匹配
   function matchCell(cell){
     const parts = cell.split(/[/／]/).map(s=>s.trim().toLowerCase()).filter(Boolean);
     const cl = cell.toLowerCase();
     for(const p of allYipin){
       const n = p.name.trim().toLowerCase();
       if(n.length>=2 && (parts.includes(n) || cl.includes(n))) return p;
+      for(const a of (YIPIN_ALIAS[p.name]||[])){
+        const al = a.toLowerCase();
+        if(parts.includes(al) || (al.length>=4 && cl.includes(al))) return p;  // 短别名只精确匹配部件
+      }
     }
     return null;
   }
