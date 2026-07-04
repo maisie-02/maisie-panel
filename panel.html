@@ -1971,7 +1971,7 @@ try { renderFollowup(); } catch(e) { console.warn('followup render error:', e); 
   const SB_URL  = 'https://kjfglthwocbzinkiyfxm.supabase.co';
   const SB_SVC  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZmdsdGh3b2Niemlua2l5ZnhtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjcwMDQ4MywiZXhwIjoyMDk4Mjc2NDgzfQ.DflCxDTmFocH5e0_JiDv82dxGWeEX1cnWtj8hUqwOTI';
   const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZmdsdGh3b2Niemlua2l5ZnhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDA0ODMsImV4cCI6MjA5ODI3NjQ4M30.IDDfWZf0Q2DW2DTm6hmoPsQDsFmBzZmkZP1KKjxJct8';
-  const ADMIN_EMAIL = 'maisie@hr.co';
+  const ADMIN_EMAILS = ['maisie@hr.co', 'miko@hr.co'];  // 梅西 + 咪扣 可管理账号
 
   const sb = supabase.createClient(SB_URL, SB_ANON);
 
@@ -1986,7 +1986,7 @@ try { renderFollowup(); } catch(e) { console.warn('followup render error:', e); 
     document.getElementById('sidebar-username').textContent = displayName;
 
     // 权限控制：admin 看全部，其他人按 sections 过滤
-    if(user.email === ADMIN_EMAIL){
+    if(ADMIN_EMAILS.includes(user.email)){
       document.getElementById('adminBtn').style.display = 'block';
     } else {
       const allowed = meta.sections || [];
