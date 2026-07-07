@@ -1184,17 +1184,18 @@ async function doUploadYipin() {
   if(!sheet) throw new Error('找不到逸品标签页 gid='+YIPIN_GID);
   log(`标签页: ${sheet}`);
   const oVals = await readRange(token, YIPIN_ID, `${sheet}!O3:O300`);
-  const allYipin = [...yipinData,...yipin2Data].filter(p=>p.name && p.dl);
+  const s1list = yipinData.filter(p=>p.name && p.dl);   // 站1平台，只配 O3-O21
+  const s2list = yipin2Data.filter(p=>p.name && p.dl);  // 站2平台，只配 O22-O54
   // 好妻网 O 列的别名 → 面板平台名（补齐格式差异）
   const YIPIN_ALIAS = {
     'Pornhub': ['ph'], 'TikTok': ['tt'], 'Redgift': ['rg'],
     'deepseek成人版': ['deepseek','成人deepseek'], '好莱坞': ['好莱污'],
   };
   // 好妻网 O 列常是「别名A/别名B/…」，格子里含面板平台名即匹配
-  function matchCell(cell){
+  function matchCell(cell, list){
     const parts = cell.split(/[/／]/).map(s=>s.trim().toLowerCase()).filter(Boolean);
     const cl = cell.toLowerCase();
-    for(const p of allYipin){
+    for(const p of list){
       const n = p.name.trim().toLowerCase();
       if(n.length>=2 && (parts.includes(n) || cl.includes(n))) return p;
       for(const a of (YIPIN_ALIAS[p.name]||[])){
@@ -1208,7 +1209,12 @@ async function doUploadYipin() {
   for(let i=0;i<oVals.length;i++){
     const cell=(oVals[i]?.[0]||'').trim();
     if(!cell) continue;
-    const p = matchCell(cell);
+    const rowNo = i+3;  // 实际行号(O3起)
+    let list=null;
+    if(rowNo>=3 && rowNo<=21) list=s1list;         // 站1段 O3-O21 只配站1平台
+    else if(rowNo>=22 && rowNo<=54) list=s2list;   // 站2段 O22-O54 只配站2平台
+    else continue;                                  // 超出范围忽略
+    const p = matchCell(cell, list);
     if(p){ updates.push({range:`${sheet}!Q${i+3}`,values:[[p.dl]]}); matched++; }
     else unmatched.push(cell.split(/[/／]/)[0]);
   }
