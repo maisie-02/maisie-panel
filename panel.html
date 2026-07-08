@@ -1184,8 +1184,9 @@ async function doUploadYipin() {
   if(!sheet) throw new Error('找不到逸品标签页 gid='+YIPIN_GID);
   log(`标签页: ${sheet}`);
   const oVals = await readRange(token, YIPIN_ID, `${sheet}!O3:O300`);
-  const s1list = yipinData.filter(p=>p.name && p.dl);   // 站1平台，只配 O3-O21
-  const s2list = yipin2Data.filter(p=>p.name && p.dl);  // 站2平台，只配 O22-O54
+  const YIPIN_IGNORE = ['YYLX','YJZ','CMD','uu加速器','白嫖射','好妻网web'];  // 系统网址表无对应行，忽视不上传
+  const s1list = yipinData.filter(p=>p.name && p.dl && !YIPIN_IGNORE.includes(p.name));   // 站1平台，只配 O3-O21
+  const s2list = yipin2Data.filter(p=>p.name && p.dl && !YIPIN_IGNORE.includes(p.name));  // 站2平台，只配 O22-O54
   // 好妻网 O 列的别名 → 面板平台名（补齐格式差异）
   const YIPIN_ALIAS = {
     'Pornhub': ['ph'], 'TikTok': ['tt'], 'Redgift': ['rg'],
