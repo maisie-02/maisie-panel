@@ -232,7 +232,22 @@
       <div class="nav-item sub" id="nav-evaluation" onclick="showSection('evaluation',this)">组员工作评量</div>
     </div>
   </div>
-  <div class="nav-item" id="nav-followup" onclick="showSection('followup',this)">待跟进事项</div>
+  <div class="nav-group">
+    <div class="nav-group-header collapsed" id="grp-header-followup" onclick="toggleGroup('followup')">
+      待跟进事项 <span class="arrow">▾</span>
+    </div>
+    <div class="nav-group-items collapsed" id="grp-items-followup">
+      <div class="nav-item sub" onclick="showFollowupGroup('all',this)">全部群组</div>
+      <div class="nav-item sub" onclick="showFollowupGroup('恒睿',this)">恒睿</div>
+      <div class="nav-item sub" onclick="showFollowupGroup('逸品',this)">逸品</div>
+      <div class="nav-item sub" onclick="showFollowupGroup('极乐引擎',this)">极乐引擎</div>
+      <div class="nav-item sub" onclick="showFollowupGroup('万有引力',this)">万有引力</div>
+      <div class="nav-item sub" onclick="showFollowupGroup('北斗伊甸',this)">北斗伊甸</div>
+      <div class="nav-item sub" onclick="showFollowupGroup('恒丰',this)">恒丰</div>
+      <div class="nav-item sub" onclick="showFollowupGroup('经纬',this)">经纬</div>
+      <div class="nav-item sub" onclick="showFollowupGroup('紫宸星宇',this)">紫宸星宇</div>
+    </div>
+  </div>
   <div class="nav-group">
     <div class="nav-group-header collapsed" id="grp-header-info" onclick="toggleGroup('info')">
       各平台最新信息 <span class="arrow">▾</span>
@@ -432,23 +447,11 @@
         <div class="stat-label">已处理</div>
       </div>
     </div>
-    <div class="followup-filter" style="align-items:center;justify-content:space-between;">
-      <div style="display:flex;gap:8px;">
-        <button class="followup-filter-btn active" onclick="setFollowupFilter('all',this)">全部</button>
-        <button class="followup-filter-btn" onclick="setFollowupFilter('need',this)">需跟进</button>
-        <button class="followup-filter-btn" onclick="setFollowupFilter('done',this)">已处理</button>
-      </div>
-      <select id="followup-group-filter" class="followup-input" style="flex:0 0 auto;width:auto;min-width:130px;cursor:pointer;padding:6px 10px;" onchange="setFollowupGroup(this.value)">
-        <option value="all">全部群组</option>
-        <option value="恒睿">【恒睿】</option>
-        <option value="逸品">【逸品】</option>
-        <option value="极乐引擎">【极乐引擎】</option>
-        <option value="万有引力">【万有引力】</option>
-        <option value="北斗伊甸">【北斗伊甸】</option>
-        <option value="恒丰">【恒丰】</option>
-        <option value="经纬">【经纬】</option>
-        <option value="紫宸星宇">【紫宸星宇】</option>
-      </select>
+    <div class="followup-filter">
+      <span id="followup-group-label" style="font-size:13px;font-weight:600;color:var(--accent);margin-right:8px;align-self:center;">全部群组</span>
+      <button class="followup-filter-btn active" onclick="setFollowupFilter('all',this)">全部</button>
+      <button class="followup-filter-btn" onclick="setFollowupFilter('need',this)">需跟进</button>
+      <button class="followup-filter-btn" onclick="setFollowupFilter('done',this)">已处理</button>
     </div>
     <div class="followup-list" id="followup-list"></div>
   </div>
@@ -1920,8 +1923,17 @@ function itemGroup(item) {
   return m ? m[1] : '';
 }
 
-function setFollowupGroup(v) {
-  followupGroupFilter = v;
+// 左侧导航「待跟进事项」下的群组子项：切到待跟进区 + 设群组过滤 + 高亮
+function showFollowupGroup(group, el) {
+  followupGroupFilter = group;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item, .nav-group-header').forEach(n => n.classList.remove('active'));
+  document.getElementById('section-followup').classList.add('active');
+  el.classList.add('active');
+  const grp = el.closest('.nav-group');
+  if (grp) grp.querySelector('.nav-group-header').classList.add('active');
+  const lbl = document.getElementById('followup-group-label');
+  if (lbl) lbl.textContent = group === 'all' ? '全部群组' : '【' + group + '】';
   renderFollowup();
 }
 
