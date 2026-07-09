@@ -1857,7 +1857,10 @@ try {
     followupItems.forEach(it => {
       if (it.source === 'tg') {
         const fresh = tgById.get(String(it.id));
-        if (fresh) { it.text = fresh.text; it.group = fresh.group; }   // 刷新文本+群组，不动 it.status
+        if (fresh) {
+          it.text = fresh.text; it.group = fresh.group;   // 刷新文本+群组
+          if (!it.manual) it.status = fresh.status;        // 未被用户手动改过 → 跟随TG最新状态(据回复判定的已处理会同步过来)
+        }
       }
     });
     const newItems = tgFollowups.filter(i => !existingIds.has(String(i.id)));
@@ -1899,6 +1902,7 @@ function toggleFollowupStatus(id) {
   const item = followupItems.find(i => String(i.id) === String(id));
   if (!item) return;
   item.status = item.status === 'need' ? 'done' : 'need';
+  item.manual = true;   // 用户手动改过 → 之后每日抓取不再自动覆盖它的状态
   saveFollowup();
   renderFollowup();
 }
