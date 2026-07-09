@@ -791,16 +791,31 @@ const verifyAlerts = {"date": "2026-07-09 07:20", "items": [{"name": "草榴短"
 // VERIFY_ALERTS_END
 
 let linkOverrides = {};  // { platform: { qm|qd|h5: url } }  来自 Supabase link_overrides 表
-function ovr(name, type, url){ return (linkOverrides[name] && linkOverrides[name][type]) || url; }
+// 覆盖值可能带 PAUSE:: 前缀（暂停覆盖=冻结当前链接、每日不覆盖）；取值时去前缀
+function ovr(name, type, url){
+  const o = linkOverrides[name] && linkOverrides[name][type];
+  if (!o) return url;
+  return o.startsWith('PAUSE::') ? o.slice(7) : o;
+}
+function isPaused(name, type){ const o = linkOverrides[name] && linkOverrides[name][type]; return !!(o && o.startsWith('PAUSE::')); }
+function isEdited(name, type){ const o = linkOverrides[name] && linkOverrides[name][type]; return !!(o && !o.startsWith('PAUSE::')); }
+function labelOf(type){ return type==='qm'?'全民代理':type==='qd'?'渠道代理':type==='dl'?'亚马逊下载':'H5链接'; }
 
 function makeRow(url, type, platform) {
-  const label = type === 'qm' ? '全民代理' : type === 'qd' ? '渠道代理' : 'H5链接';
-  const edited = !!(linkOverrides[platform] && linkOverrides[platform][type]);
+  const label = labelOf(type);
+  const paused = isPaused(platform, type);
+  const edited = isEdited(platform, type);
+  const mark = paused ? ' <span style="color:#2563eb;font-size:11px">(🔒已暂停覆盖)</span>'
+                      : (edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : '');
+  const pauseBtn = paused
+    ? `<button class="copy-btn" style="background:#dbeafe;color:#1e40af" onclick="resumeLink('${platform}','${type}')">恢复覆盖</button>`
+    : `<button class="copy-btn" style="background:#f1f5f9;color:#475569" onclick="pauseLink('${platform}','${type}','${url}')">暂停覆盖</button>`;
   return `<li class="domain-item">
     <span class="type-tag ${type}">${label}</span>
-    <span class="domain-url"><a href="${url}" target="_blank">${url}</a>${edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : ''}</span>
+    <span class="domain-url"><a href="${url}" target="_blank">${url}</a>${mark}</span>
     <button class="copy-btn" onclick="copyUrl('${url}')">复制</button>
     <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${platform}','${type}')">编辑</button>
+    ${pauseBtn}
   </li>`;
 }
 
@@ -858,10 +873,12 @@ async function loadOverrides(){
     if (typeof renderYipin === 'function') renderYipin();
   } catch(e) { console.warn(e); }
 }
+function _rerenderLinks(){ renderMain(); if (typeof renderYipin === 'function') renderYipin(); }
+
 window.editLink = async function(platform, type){
-  const cur = (linkOverrides[platform] && linkOverrides[platform][type]) || '';
-  const label = type === 'qm' ? '全民代理' : type === 'qd' ? '渠道代理' : type === 'dl' ? '亚马逊下载' : 'H5链接';
-  const url = prompt(`修改「${dispName(platform)}」的${label}链接：\n（留空并确定 = 清除手改、恢复自动抓取）`, cur);
+  let cur = (linkOverrides[platform] && linkOverrides[platform][type]) || '';
+  if (cur.startsWith('PAUSE::')) cur = cur.slice(7);
+  const url = prompt(`修改「${dispName(platform)}」的${labelOf(type)}链接：\n（留空并确定 = 清除手改、恢复自动抓取）`, cur);
   if (url === null) return;
   if (!_sbo) { alert('未连接数据库，无法保存'); return; }
   try {
@@ -874,9 +891,32 @@ window.editLink = async function(platform, type){
         { onConflict: 'platform,type' });
       (linkOverrides[platform] = linkOverrides[platform] || {})[type] = url.trim();
     }
-    renderMain();
-    if (typeof renderYipin === 'function') renderYipin();
+    _rerenderLinks();
   } catch(e) { alert('保存失败：' + e.message); }
+};
+
+// 暂停覆盖：冻结当前链接（PAUSE:: 前缀），每日自动更新不再覆盖它
+window.pauseLink = async function(platform, type, url){
+  if (!_sbo) { alert('未连接数据库，无法保存'); return; }
+  if (!confirm(`暂停「${dispName(platform)}」的${labelOf(type)}自动更新？\n将冻结当前链接，之后每日不再覆盖。可随时点「恢复覆盖」取消，隔日恢复更新最新链接。`)) return;
+  try {
+    const val = 'PAUSE::' + url;
+    await _sbo.from('link_overrides').upsert(
+      { platform, type, url: val, updated_at: new Date().toISOString() },
+      { onConflict: 'platform,type' });
+    (linkOverrides[platform] = linkOverrides[platform] || {})[type] = val;
+    _rerenderLinks();
+  } catch(e) { alert('保存失败：' + e.message); }
+};
+
+// 恢复覆盖：取消暂停，删除冻结 → 隔日自动更新最新链接
+window.resumeLink = async function(platform, type){
+  if (!_sbo) { alert('未连接数据库，无法保存'); return; }
+  try {
+    await _sbo.from('link_overrides').delete().eq('platform', platform).eq('type', type);
+    if (linkOverrides[platform]) delete linkOverrides[platform][type];
+    _rerenderLinks();
+  } catch(e) { alert('恢复失败：' + e.message); }
 };
 loadOverrides();
 
@@ -982,12 +1022,19 @@ const yipinData = [
 
 function makeYipinCard(p) {
   const url = ovr(p.name, 'dl', p.dl);
-  const edited = !!(linkOverrides[p.name] && linkOverrides[p.name]['dl']);
+  const paused = isPaused(p.name, 'dl');
+  const edited = isEdited(p.name, 'dl');
+  const mark = paused ? ' <span style="color:#2563eb;font-size:11px">(🔒已暂停覆盖)</span>'
+                      : (edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : '');
+  const pauseBtn = paused
+    ? `<button class="copy-btn" style="background:#dbeafe;color:#1e40af" onclick="resumeLink('${p.name}','dl')">恢复覆盖</button>`
+    : `<button class="copy-btn" style="background:#f1f5f9;color:#475569" onclick="pauseLink('${p.name}','dl','${url}')">暂停覆盖</button>`;
   const row = `<li class="domain-item">
     <span class="type-tag dl">亚马逊</span>
-    <span class="domain-url"><a href="${url}" target="_blank">${url}</a>${edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : ''}</span>
+    <span class="domain-url"><a href="${url}" target="_blank">${url}</a>${mark}</span>
     <button class="copy-btn" onclick="copyUrl('${url}')">复制</button>
     <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${p.name}','dl')">编辑</button>
+    ${pauseBtn}
   </li>`;
   return `<div class="platform-card">
     <div class="platform-name">${p.name} <span class="badge ok">✓</span></div>
