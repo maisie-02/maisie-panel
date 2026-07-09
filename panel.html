@@ -808,11 +808,12 @@ async function loadOverrides(){
     linkOverrides = {};
     (data || []).forEach(r => { (linkOverrides[r.platform] = linkOverrides[r.platform] || {})[r.type] = r.url; });
     renderMain();
+    if (typeof renderYipin === 'function') renderYipin();
   } catch(e) { console.warn(e); }
 }
 window.editLink = async function(platform, type){
   const cur = (linkOverrides[platform] && linkOverrides[platform][type]) || '';
-  const label = type === 'qm' ? '全民代理' : type === 'qd' ? '渠道代理' : 'H5链接';
+  const label = type === 'qm' ? '全民代理' : type === 'qd' ? '渠道代理' : type === 'dl' ? '亚马逊下载' : 'H5链接';
   const url = prompt(`修改「${dispName(platform)}」的${label}链接：\n（留空并确定 = 清除手改、恢复自动抓取）`, cur);
   if (url === null) return;
   if (!_sbo) { alert('未连接数据库，无法保存'); return; }
@@ -827,6 +828,7 @@ window.editLink = async function(platform, type){
       (linkOverrides[platform] = linkOverrides[platform] || {})[type] = url.trim();
     }
     renderMain();
+    if (typeof renderYipin === 'function') renderYipin();
   } catch(e) { alert('保存失败：' + e.message); }
 };
 loadOverrides();
@@ -928,15 +930,32 @@ const yipinData = [
 ];
 
 function makeYipinCard(p) {
+  const url = ovr(p.name, 'dl', p.dl);
+  const edited = !!(linkOverrides[p.name] && linkOverrides[p.name]['dl']);
   const row = `<li class="domain-item">
     <span class="type-tag dl">亚马逊</span>
-    <span class="domain-url"><a href="${p.dl}" target="_blank">${p.dl}</a></span>
-    <button class="copy-btn" onclick="copyUrl('${p.dl}')">复制</button>
+    <span class="domain-url"><a href="${url}" target="_blank">${url}</a>${edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : ''}</span>
+    <button class="copy-btn" onclick="copyUrl('${url}')">复制</button>
+    <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${p.name}','dl')">编辑</button>
   </li>`;
   return `<div class="platform-card">
     <div class="platform-name">${p.name} <span class="badge ok">✓</span></div>
     <ul class="domain-list">${row}</ul>
   </div>`;
+}
+
+// 重渲染所有逸品容器（站1独立 / 站2独立 / 合并视图站1+3+2），供覆盖加载后与编辑后刷新
+function renderYipin() {
+  const z1 = yipinData.map(makeYipinCard).join('');
+  const z2 = yipin2Data.map(makeYipinCard).join('');
+  const z3 = (typeof yipin3Data !== 'undefined' ? yipin3Data : []).map(makeYipinCard).join('');
+  const set = (id, html) => { const e = document.getElementById(id); if (e) e.innerHTML = html; };
+  const num = (id, n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
+  set('yipin-platforms', z1);   num('yipin-link-count', yipinData.length);
+  set('yipin2-platforms', z2);  num('yipin2-link-count', yipin2Data.length);
+  set('yipin-all-z1', z1);      set('yipin-all-z2', z2);   set('yipin-all-z3', z3);
+  const total = yipinData.length + yipin2Data.length + (typeof yipin3Data !== 'undefined' ? yipin3Data.length : 0);
+  num('yipin-all-count', total); num('yipin-all-link-count', total);
 }
 document.getElementById('yipin-platforms').innerHTML = yipinData.map(makeYipinCard).join('');
 document.getElementById('yipin-link-count').textContent = yipinData.length;
