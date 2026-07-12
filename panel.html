@@ -1360,7 +1360,7 @@ async function doUploadYipin() {
     else if(rowNo>=22 && rowNo<=54) list=s2list;   // 站2段 O22-O54 只配站2平台
     else continue;                                  // 超出范围忽略
     const p = matchCell(cell, list);
-    if(p){ updates.push({range:`${sheet}!Q${i+3}`,values:[[p.dl]]}); matched++; }
+    if(p){ updates.push({range:`${sheet}!Q${i+3}`,values:[[ovr(p.name,'dl',p.dl)]]}); matched++; }  // 用面板显示值(暂停时=冻结链接)
     else unmatched.push(cell.split(/[/／]/)[0]);
   }
   log(`匹配 ${matched} 个，写入 ${updates.length} 格...`);
