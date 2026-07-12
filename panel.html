@@ -1987,6 +1987,8 @@ try {
 try {
   if (Array.isArray(tgFollowups) && tgFollowups.length) {
     const tgById = new Map(tgFollowups.map(i => [String(i.id), i]));
+    // 同步移除数据源里已不存在的 TG 项（被过滤掉/超出时间窗的旧残留，如极乐引擎非四部bot的旧数据）；手动新增项(非tg)保留
+    followupItems = followupItems.filter(it => it.source !== 'tg' || tgById.has(String(it.id)));
     const existingIds = new Set(followupItems.map(i => String(i.id)));
     followupItems.forEach(it => {
       if (it.source === 'tg') {
