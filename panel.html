@@ -791,7 +791,7 @@ const h5Full = { 'Niconico': 'https://niconicocn.com', '性癖': 'https://xpsp.q
 const verifyAlerts = {"date": "2026-07-12 07:20", "items": [{"name": "草榴短", "type": "全民", "info": "cl"}, {"name": "草榴短", "type": "渠道", "info": "cl"}, {"name": "海角", "type": "全民", "info": "色逼哩"}, {"name": "海角", "type": "渠道", "info": "色逼哩"}, {"name": "51乱伦", "type": "全民", "info": "母瘾社区"}, {"name": "51乱伦", "type": "渠道", "info": "母瘾社区"}, {"name": "热穴高校", "type": "全民", "info": "热血高校"}, {"name": "热穴高校", "type": "渠道", "info": "热血高校"}, {"name": "新鉴黄师", "type": "全民", "info": "鉴黄师"}, {"name": "新鉴黄师", "type": "渠道", "info": "鉴黄师"}]};
 // VERIFY_ALERTS_END
 // YIPIN_VERIFY_ALERTS_START
-const yipinVerifyAlerts = {"date": "", "items": []};
+const yipinVerifyAlerts = {"date": "2026-07-12 08:17", "items": [{"name": "花花公子", "type": "逸品站1", "info": "打不开:HTTPSConnectionPool(host='d3ez"}, {"name": "deepseek成人版", "type": "逸品站2", "info": "打不开:HTTPSConnectionPool(host='d32b"}, {"name": "酥妻ultra", "type": "逸品站2", "info": "打不开:HTTPSConnectionPool(host='dhrr"}, {"name": "幼甜", "type": "逸品站2", "info": "打不开:HTTPSConnectionPool(host='dg5i"}, {"name": "好莱坞", "type": "逸品站2", "info": "打不开:HTTPSConnectionPool(host='dihf"}]};
 // YIPIN_VERIFY_ALERTS_END
 
 let linkOverrides = {};  // { platform: { qm|qd|h5: url } }  来自 Supabase link_overrides 表
@@ -859,6 +859,19 @@ function renderVerifyAlerts(){
   </div>`;
 }
 renderVerifyAlerts();
+
+// 逸品链接校验提醒栏（同恒睿，展示在逸品页顶部）
+function renderYipinVerifyAlerts(){
+  const el = document.getElementById('yipin-verify-alerts');
+  if(!el) return;
+  const items = (typeof yipinVerifyAlerts !== 'undefined' && yipinVerifyAlerts.items) || [];
+  if(!items.length){ el.innerHTML = ''; return; }
+  el.innerHTML = `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#9a3412;line-height:1.7;">
+    ⚠️ <b>逸品链接校验提醒</b> <span style="color:#c2792c;">（${yipinVerifyAlerts.date||''}）</span>：以下 <b>${items.length}</b> 条链接已照常更新，但页面标题与平台名不符，请抽查是否为正确平台（不符可用「编辑」改正）：
+    <div style="margin-top:6px;">${items.map(i=>`<span style="display:inline-block;background:#fff;border:1px solid #fed7aa;border-radius:4px;padding:1px 6px;margin:2px 4px 2px 0;">${i.name}·${i.type} <span style="color:#b45309;">页面:${i.info||'?'}</span></span>`).join('')}</div>
+  </div>`;
+}
+renderYipinVerifyAlerts();
 
 // ── 链接手动覆盖：读写 Supabase link_overrides 表 ──
 const _OVR_URL = 'https://kjfglthwocbzinkiyfxm.supabase.co';
@@ -953,7 +966,7 @@ const yipin2Data = [
   {"name": "铁粉空间", "dl": "https://d39f4g158zuzo7.cloudfront.net"},
   {"name": "酥妻ultra", "dl": "https://dhrrgkrl52kf3.cloudfront.net"},
   {"name": "幼甜", "dl": "https://dg5iydm7p1xjs.cloudfront.net"},
-  {"name": "拨阴", "dl": "https://d1t1hlfd6ss0z6.cloudfront.net"},
+  {"name": "拨阴", "dl": "https://by460.com"},
   {"name": "台姬店", "dl": "https://d2u65a11fzopd2.cloudfront.net"},
   {"name": "黄色小报", "dl": "https://d13vqx2gs6h1yp.cloudfront.net"},
   {"name": "潮汐映画", "dl": "https://d39tyufhe8yjmm.cloudfront.net"},
@@ -1003,7 +1016,7 @@ const cardShots = {"草榴短": {"vip": "cards/eanai97_vip.png", "coin": "cards/
 // 逸品组: 站1(除7个) + 站3(7个)
 const yipinData = [
   {"name": "Pornhub", "dl": "https://ph888.phnqcb.com"},
-  {"name": "Xvideos", "dl": "https://d1gxxn143uwisg.cloudfront.net"},
+  {"name": "Xvideos", "dl": "https://d18bpo88q64nf8.cloudfront.net"},
   {"name": "TikTok", "dl": "https://d28sjx1zxhsfcm.cloudfront.net"},
   {"name": "抖阴Pro", "dl": "https://d3fr2xtp8c9px0.cloudfront.net"},
   {"name": "抖阴Plus", "dl": "https://dajtcfugdt31i.cloudfront.net"},
@@ -1012,7 +1025,7 @@ const yipinData = [
   {"name": "奥黛", "dl": "https://d5bwhy5h1pyce.cloudfront.net"},
   {"name": "色虎", "dl": "https://d3dnbouukl6vv3.cloudfront.net"},
   {"name": "痒视频", "dl": "https://d1qmz13oftitqm.cloudfront.net"},
-  {"name": "18R", "dl": "https://d28y8eenm5qk6t.cloudfront.net"},
+  {"name": "18R", "dl": "https://d12u54dmm20wlz.cloudfront.net"},
   {"name": "污漫社", "dl": "https://dy2o5c52jjggt.cloudfront.net"},
   {"name": "花花公子", "dl": "https://d3ezu5jk7408co.cloudfront.net"},
   {"name": "Onlyfans", "dl": "https://d2frygudxefihm.cloudfront.net"},
