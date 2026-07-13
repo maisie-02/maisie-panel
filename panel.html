@@ -903,9 +903,10 @@ window.editLink = async function(platform, type){
       await _sbo.from('link_overrides').delete().eq('platform', platform).eq('type', type);
       if (linkOverrides[platform]) delete linkOverrides[platform][type];
     } else {
-      await _sbo.from('link_overrides').upsert(
+      const { error } = await _sbo.from('link_overrides').upsert(
         { platform, type, url: url.trim(), updated_at: new Date().toISOString() },
         { onConflict: 'platform,type' });
+      if (error) { alert('手改保存失败，未写入数据库：\n' + error.message); return; }
       (linkOverrides[platform] = linkOverrides[platform] || {})[type] = url.trim();
     }
     _rerenderLinks();
@@ -918,9 +919,10 @@ window.pauseLink = async function(platform, type, url){
   if (!confirm(`暂停「${dispName(platform)}」的${labelOf(type)}自动更新？\n将冻结当前链接，之后每日不再覆盖。可随时点「恢复覆盖」取消，隔日恢复更新最新链接。`)) return;
   try {
     const val = 'PAUSE::' + url;
-    await _sbo.from('link_overrides').upsert(
+    const { error } = await _sbo.from('link_overrides').upsert(
       { platform, type, url: val, updated_at: new Date().toISOString() },
       { onConflict: 'platform,type' });
+    if (error) { alert('暂停覆盖保存失败，未写入数据库：\n' + error.message + '\n\n（面板显示不代表已冻结，请截图反馈）'); return; }
     (linkOverrides[platform] = linkOverrides[platform] || {})[type] = val;
     _rerenderLinks();
   } catch(e) { alert('保存失败：' + e.message); }
