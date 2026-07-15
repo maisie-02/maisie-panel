@@ -578,10 +578,6 @@
       ▍ 站2
     </div>
     <div id="yipin-all-z2"></div>
-    <div style="font-size:12px;color:#6b7280;margin:16px 0 12px;padding:8px 12px;background:#1a1a2e;border-radius:6px;border:1px solid #2d2d4e;">
-      ▍ H5链接
-    </div>
-    <div id="yipin-all-h5"></div>
   </div>
 
 </div>
@@ -820,7 +816,7 @@ const h5Full = { 'Niconico': 'https://niconicocn.com', '性癖': 'https://xpsp.q
 const verifyAlerts = {"date": "2026-07-16 07:09", "items": [{"name": "黄色仓库", "type": "渠道", "info": "qq看片"}]};
 // VERIFY_ALERTS_END
 // YIPIN_VERIFY_ALERTS_START
-const yipinVerifyAlerts = {"date": "2026-07-16 07:43", "items": [{"name": "快播/KB", "type": "逸品H5", "info": "打不开:HTTPSConnectionPool(host='kb.e"}, {"name": "海角社区/小马拉大车/CHJ", "type": "逸品H5", "info": "打不开:HTTPSConnectionPool(host='chj."}, {"name": "白嫖社(网页版)", "type": "逸品H5", "info": "bps"}]};
+const yipinVerifyAlerts = {"date": "2026-07-16 07:58", "items": [{"name": "快播", "type": "逸品H5", "info": "打不开:HTTPSConnectionPool(host='kb.e"}, {"name": "小马拉大车", "type": "逸品H5", "info": "打不开:HTTPSConnectionPool(host='chj."}]};
 // YIPIN_VERIFY_ALERTS_END
 
 let linkOverrides = {};  // { platform: { qm|qd|h5: url } }  来自 Supabase link_overrides 表
@@ -976,39 +972,39 @@ document.getElementById('nodomain-platforms').innerHTML = '';
 
 // 逸品站2
 const yipin2Data = [
-  {"name": "小红书", "dl": "https://d147sh21dycqwn.cloudfront.net"},
-  {"name": "骚穴宝", "dl": "https://d394a3cnv8baza.cloudfront.net"},
-  {"name": "Redgift", "dl": "https://d5iesh7ad41jo.cloudfront.net"},
-  {"name": "寻情记", "dl": "https://d1mhhwcd8bi2d2.cloudfront.net"},
-  {"name": "魅影", "dl": "https://d1x8wmogi5mm75.cloudfront.net"},
-  {"name": "性达人", "dl": "https://d1oirmmqv26cfs.cloudfront.net"},
+  {"name": "小红书", "dl": "https://d147sh21dycqwn.cloudfront.net", "h5": "https://fbi.bb38j.cc"},
+  {"name": "骚穴宝", "dl": "https://d394a3cnv8baza.cloudfront.net", "h5": "https://llq.goh389.com"},
+  {"name": "Redgift", "dl": "https://d5iesh7ad41jo.cloudfront.net", "h5": "https://rg.ouy58.com"},
+  {"name": "寻情记", "dl": "https://d1mhhwcd8bi2d2.cloudfront.net", "h5": "https://yylx.q2orq0.com/#/"},
+  {"name": "魅影", "dl": "https://d1x8wmogi5mm75.cloudfront.net", "h5": "https://my.zvi518.com"},
+  {"name": "性达人", "dl": "https://d1oirmmqv26cfs.cloudfront.net", "h5": "https://xdr.mbm105.com"},
   {"name": "福利姬", "dl": "https://d2eld98dp8as0u.cloudfront.net"},
-  {"name": "职业私欲", "dl": "https://d34bzvwg91qykp.cloudfront.net"},
+  {"name": "职业私欲", "dl": "https://d34bzvwg91qykp.cloudfront.net", "h5": "https://af.psi744.com"},
   {"name": "51吃瓜", "dl": "https://51guagua.org"},
-  {"name": "调教师", "dl": "https://d2jcdk01uwpykp.cloudfront.net"},
-  {"name": "99夜", "dl": "https://d4qwtfbgyzjfc.cloudfront.net"},
-  {"name": "玩偶AV", "dl": "https://d24k79w4gb3mov.cloudfront.net"},
-  {"name": "淫君子", "dl": "https://d35yitoxgzyudy.cloudfront.net"},
-  {"name": "deepseek成人版", "dl": "https://dpjm6ut873f72.cloudfront.net"},
-  {"name": "猫眼票房", "dl": "https://d1cvz2ol66sey.cloudfront.net"},
-  {"name": "星淫", "dl": "https://d1u99xt4cadkpy.cloudfront.net"},
-  {"name": "七宗罪", "dl": "https://d12enzgpvk0h2t.cloudfront.net"},
-  {"name": "PH·Prem", "dl": "https://bzm101.com"},
-  {"name": "铁粉空间", "dl": "https://d39f4g158zuzo7.cloudfront.net"},
-  {"name": "酥妻ultra", "dl": "https://d25w9nwhj40j9p.cloudfront.net"},
+  {"name": "调教师", "dl": "https://d2jcdk01uwpykp.cloudfront.net", "h5": "https://tjs.etm422.com"},
+  {"name": "99夜", "dl": "https://d4qwtfbgyzjfc.cloudfront.net", "h5": "https://tsdb.eyx680.com/"},
+  {"name": "玩偶AV", "dl": "https://d24k79w4gb3mov.cloudfront.net", "h5": "https://wo.fxc367.com"},
+  {"name": "淫君子", "dl": "https://d35yitoxgzyudy.cloudfront.net", "h5": "https://yjz.lhj887.com"},
+  {"name": "deepseek成人版", "dl": "https://dpjm6ut873f72.cloudfront.net", "h5": "https://ds.xvb435.com"},
+  {"name": "猫眼票房", "dl": "https://d1cvz2ol66sey.cloudfront.net", "h5": "https://myy.shw241.com"},
+  {"name": "星淫", "dl": "https://d1u99xt4cadkpy.cloudfront.net", "h5": "https://xy.thb404.com"},
+  {"name": "七宗罪", "dl": "https://d12enzgpvk0h2t.cloudfront.net", "h5": "https://qzz.wma370.com"},
+  {"name": "PH·Prem", "dl": "https://bzm101.com", "h5": "https://bzmh.xya477.com"},
+  {"name": "铁粉空间", "dl": "https://d39f4g158zuzo7.cloudfront.net", "h5": "https://tfkj.1jorsi.com"},
+  {"name": "酥妻ultra", "dl": "https://d25w9nwhj40j9p.cloudfront.net", "h5": "https://sq.myu603.com"},
   {"name": "幼甜", "dl": "https://ph888.phnqcb.com"},
-  {"name": "拨阴", "dl": "https://by460.com"},
-  {"name": "台姬店", "dl": "https://d2u65a11fzopd2.cloudfront.net"},
-  {"name": "黄色小报", "dl": "https://d13vqx2gs6h1yp.cloudfront.net"},
-  {"name": "潮汐映画", "dl": "https://d39tyufhe8yjmm.cloudfront.net"},
-  {"name": "嫖虫巴士", "dl": "https://d25747xuvf4hlf.cloudfront.net"},
-  {"name": "苍井空", "dl": "https://d3qmncmen7ibo4.cloudfront.net"},
-  {"name": "18禁漫", "dl": "https://dibbw9lb51q7y.cloudfront.net"},
-  {"name": "魅魔vlog", "dl": "https://d2rcbiec54alpl.cloudfront.net"},
+  {"name": "拨阴", "dl": "https://by460.com", "h5": "https://by.wbk181.com/#/"},
+  {"name": "台姬店", "dl": "https://d2u65a11fzopd2.cloudfront.net", "h5": "https://tjd.grx492.com/#/circle"},
+  {"name": "黄色小报", "dl": "https://d13vqx2gs6h1yp.cloudfront.net", "h5": "https://hsxb.ovb173.com"},
+  {"name": "潮汐映画", "dl": "https://d39tyufhe8yjmm.cloudfront.net", "h5": "https://cxyh.rdu273.com"},
+  {"name": "嫖虫巴士", "dl": "https://d25747xuvf4hlf.cloudfront.net", "h5": "https://pcbs.wer799.com"},
+  {"name": "苍井空", "dl": "https://d3qmncmen7ibo4.cloudfront.net", "h5": "https://cjk.gay351.com"},
+  {"name": "18禁漫", "dl": "https://dibbw9lb51q7y.cloudfront.net", "h5": "https://sbjm.pbj911.com"},
+  {"name": "魅魔vlog", "dl": "https://d2rcbiec54alpl.cloudfront.net", "h5": "https://mmv.xdx794.com/#/"},
   {"name": "好莱坞", "dl": "https://ph888.phnqcb.com"},
   {"name": "欲见", "dl": "https://d3kodogrjivx6s.cloudfront.net"},
   {"name": "91淫妻", "dl": "https://d393fdsk1n9lr3.cloudfront.net"},
-  {"name": "精日头条", "dl": "https://d1d1jiw2byebzk.cloudfront.net"}
+  {"name": "精日头条", "dl": "https://d1d1jiw2byebzk.cloudfront.net", "h5": "https://jrtt.xdx794.com/"}
 ];
 
 document.getElementById('yipin2-platforms').innerHTML = yipin2Data.map(makeYipinCard).join('');
@@ -1046,86 +1042,67 @@ const cardShots = {"草榴短": {"vip": "cards/eanai97_vip.png", "coin": "cards/
 
 // 逸品组: 站1(除7个) + 站3(7个)
 const yipinData = [
-  {"name": "Pornhub", "dl": "https://ph.ph926.com"},
-  {"name": "Xvideos", "dl": "https://d18bpo88q64nf8.cloudfront.net"},
-  {"name": "TikTok", "dl": "https://d28sjx1zxhsfcm.cloudfront.net"},
-  {"name": "抖阴Pro", "dl": "https://d3fr2xtp8c9px0.cloudfront.net"},
-  {"name": "抖阴Plus", "dl": "https://dajtcfugdt31i.cloudfront.net"},
-  {"name": "性欲社", "dl": "https://d23wuiu0wei739.cloudfront.net"},
-  {"name": "N号房", "dl": "https://d289cctib6wyry.cloudfront.net"},
-  {"name": "奥黛", "dl": "https://d5bwhy5h1pyce.cloudfront.net"},
-  {"name": "色虎", "dl": "https://d3dnbouukl6vv3.cloudfront.net"},
-  {"name": "痒视频", "dl": "https://d1qmz13oftitqm.cloudfront.net"},
-  {"name": "18R", "dl": "https://d12u54dmm20wlz.cloudfront.net"},
-  {"name": "污漫社", "dl": "https://dy2o5c52jjggt.cloudfront.net"},
-  {"name": "花花公子", "dl": "https://d2gwkxb48wfoue.cloudfront.net"},
-  {"name": "Onlyfans", "dl": "https://d2frygudxefihm.cloudfront.net"},
-  {"name": "小马拉大车", "dl": "https://d27kyymk94wdey.cloudfront.net"},
-  {"name": "黄片网盘", "dl": "https://d34gk820zdhmeq.cloudfront.net"},
-  {"name": "x-chat", "dl": "https://d1ds79mnwch2sh.cloudfront.net"},
-  {"name": "懂片帝", "dl": "https://d15o3eke8hfyem.cloudfront.net"},
-  {"name": "快播", "dl": "https://d1ectd2x65ccef.cloudfront.net"},
+  {"name": "Pornhub", "dl": "https://ph.ph926.com", "h5": "https://ph.dwzec.com"},
+  {"name": "Xvideos", "dl": "https://d18bpo88q64nf8.cloudfront.net", "h5": "https://xv.xta533.com"},
+  {"name": "TikTok", "dl": "https://d28sjx1zxhsfcm.cloudfront.net", "h5": "https://tt.uod839.com"},
+  {"name": "抖阴Pro", "dl": "https://d3fr2xtp8c9px0.cloudfront.net", "h5": "https://cres.pah467.com"},
+  {"name": "抖阴Plus", "dl": "https://dajtcfugdt31i.cloudfront.net", "h5": "https://dys.nut108.com"},
+  {"name": "性欲社", "dl": "https://d23wuiu0wei739.cloudfront.net", "h5": "https://hj.prv417.com"},
+  {"name": "N号房", "dl": "https://d289cctib6wyry.cloudfront.net", "h5": "https://nhf.rqi564.com"},
+  {"name": "奥黛", "dl": "https://d5bwhy5h1pyce.cloudfront.net", "h5": "https://thyj.owj474.com"},
+  {"name": "色虎", "dl": "https://d3dnbouukl6vv3.cloudfront.net", "h5": "https://sh.kazkxf.com/"},
+  {"name": "痒视频", "dl": "https://d1qmz13oftitqm.cloudfront.net", "h5": "https://cres.mvy797.com"},
+  {"name": "18R", "dl": "https://d12u54dmm20wlz.cloudfront.net", "h5": "https://yjj.nzp721.com"},
+  {"name": "污漫社", "dl": "https://dy2o5c52jjggt.cloudfront.net", "h5": "https://jys.hez980.com"},
+  {"name": "花花公子", "dl": "https://d2gwkxb48wfoue.cloudfront.net", "h5": "https://hhgz.jqq497.com"},
+  {"name": "Onlyfans", "dl": "https://d2frygudxefihm.cloudfront.net", "h5": "https://of.qxv234.com/#/launch"},
+  {"name": "小马拉大车", "dl": "https://d27kyymk94wdey.cloudfront.net", "h5": "https://chj.zwb981.com"},
+  {"name": "黄片网盘", "dl": "https://d34gk820zdhmeq.cloudfront.net", "h5": "https://pd.yei72.com"},
+  {"name": "x-chat", "dl": "https://d1ds79mnwch2sh.cloudfront.net", "h5": "https://yk.juc17.com"},
+  {"name": "懂片帝", "dl": "https://d15o3eke8hfyem.cloudfront.net", "h5": "https://dpd.vzz157.com"},
+  {"name": "快播", "dl": "https://d1ectd2x65ccef.cloudfront.net", "h5": "https://kb.eqq448.com"},
   {"name": "豆包", "dl": "https://d3p89utrf34shw.cloudfront.net"}
 ];
 
+// 逸品卡内单行（亚马逊dl / H5链接h5，带 复制/编辑/暂停覆盖，与恒睿同卡多行一致）
+function makeYipinRow(name, type, tagClass, tagLabel, url0) {
+  const url = ovr(name, type, url0);
+  const paused = isPaused(name, type);
+  const edited = isEdited(name, type);
+  const mark = paused ? ' <span style="color:#2563eb;font-size:11px">(🔒已暂停覆盖)</span>'
+                      : (edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : '');
+  const pauseBtn = paused
+    ? `<button class="copy-btn" style="background:#dbeafe;color:#1e40af" onclick="resumeLink('${name}','${type}')">恢复覆盖</button>`
+    : `<button class="copy-btn" style="background:#f1f5f9;color:#475569" onclick="pauseLink('${name}','${type}','${url}')">暂停覆盖</button>`;
+  return `<li class="domain-item">
+    <span class="type-tag ${tagClass}">${tagLabel}</span>
+    <span class="domain-url"><a href="${url}" target="_blank">${url}</a>${mark}</span>
+    <button class="copy-btn" onclick="copyUrl('${url}')">复制</button>
+    <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${name}','${type}')">编辑</button>
+    ${pauseBtn}
+  </li>`;
+}
+
 function makeYipinCard(p) {
-  const url = ovr(p.name, 'dl', p.dl);
-  const paused = isPaused(p.name, 'dl');
-  const edited = isEdited(p.name, 'dl');
-  const mark = paused ? ' <span style="color:#2563eb;font-size:11px">(🔒已暂停覆盖)</span>'
-                      : (edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : '');
-  const pauseBtn = paused
-    ? `<button class="copy-btn" style="background:#dbeafe;color:#1e40af" onclick="resumeLink('${p.name}','dl')">恢复覆盖</button>`
-    : `<button class="copy-btn" style="background:#f1f5f9;color:#475569" onclick="pauseLink('${p.name}','dl','${url}')">暂停覆盖</button>`;
-  const row = `<li class="domain-item">
-    <span class="type-tag dl">亚马逊</span>
-    <span class="domain-url"><a href="${url}" target="_blank">${url}</a>${mark}</span>
-    <button class="copy-btn" onclick="copyUrl('${url}')">复制</button>
-    <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${p.name}','dl')">编辑</button>
-    ${pauseBtn}
-  </li>`;
+  let rows = makeYipinRow(p.name, 'dl', 'dl', '亚马逊', p.dl);
+  if (p.h5) rows += makeYipinRow(p.name, 'h5', 'h5', 'H5链接', p.h5);
   return `<div class="platform-card">
     <div class="platform-name">${p.name} <span class="badge ok">✓</span></div>
-    <ul class="domain-list">${row}</ul>
+    <ul class="domain-list">${rows}</ul>
   </div>`;
 }
 
-// 逸品H5链接卡（备案表M/N栏；名称含多个别名以/分隔，覆盖类型用 h5）
-function makeYipinH5Card(p) {
-  const url = ovr(p.name, 'h5', p.h5);
-  const paused = isPaused(p.name, 'h5');
-  const edited = isEdited(p.name, 'h5');
-  const mark = paused ? ' <span style="color:#2563eb;font-size:11px">(🔒已暂停覆盖)</span>'
-                      : (edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : '');
-  const pauseBtn = paused
-    ? `<button class="copy-btn" style="background:#dbeafe;color:#1e40af" onclick="resumeLink('${p.name}','h5')">恢复覆盖</button>`
-    : `<button class="copy-btn" style="background:#f1f5f9;color:#475569" onclick="pauseLink('${p.name}','h5','${url}')">暂停覆盖</button>`;
-  const row = `<li class="domain-item">
-    <span class="type-tag h5">H5链接</span>
-    <span class="domain-url"><a href="${url}" target="_blank">${url}</a>${mark}</span>
-    <button class="copy-btn" onclick="copyUrl('${url}')">复制</button>
-    <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${p.name}','h5')">编辑</button>
-    ${pauseBtn}
-  </li>`;
-  return `<div class="platform-card">
-    <div class="platform-name">${p.name} <span class="badge ok">✓</span></div>
-    <ul class="domain-list">${row}</ul>
-  </div>`;
-}
-
-// 重渲染所有逸品容器（站1独立 / 站2独立 / 合并视图站1+3+2+H5），供覆盖加载后与编辑后刷新
+// 重渲染所有逸品容器（站1独立 / 站2独立 / 合并视图站1+3+2），供覆盖加载后与编辑后刷新
 function renderYipin() {
   const z1 = yipinData.map(makeYipinCard).join('');
   const z2 = yipin2Data.map(makeYipinCard).join('');
   const z3 = (typeof yipin3Data !== 'undefined' ? yipin3Data : []).map(makeYipinCard).join('');
-  const zh5 = (typeof yipinH5Data !== 'undefined' ? yipinH5Data : []).map(makeYipinH5Card).join('');
   const set = (id, html) => { const e = document.getElementById(id); if (e) e.innerHTML = html; };
   const num = (id, n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
   set('yipin-platforms', z1);   num('yipin-link-count', yipinData.length);
   set('yipin2-platforms', z2);  num('yipin2-link-count', yipin2Data.length);
   set('yipin-all-z1', z1);      set('yipin-all-z2', z2);   set('yipin-all-z3', z3);
-  set('yipin-all-h5', zh5);
-  const h5len = (typeof yipinH5Data !== 'undefined' ? yipinH5Data.length : 0);
+  const h5len = yipinData.concat(yipin2Data).filter(p => p.h5).length;
   const total = yipinData.length + yipin2Data.length + (typeof yipin3Data !== 'undefined' ? yipin3Data.length : 0);
   num('yipin-all-count', total); num('yipin-all-link-count', total + h5len);
 }
@@ -1135,57 +1112,6 @@ document.getElementById('yipin-link-count').textContent = yipinData.length;
 // 逸品站3（备案表 I/J，由脚本从备案表更新；显示在合并视图「站1+3」区）
 const yipin3Data = [];
 
-// 逸品H5链接（备案表 M/N 栏，由脚本从备案表更新；名称含多个别名以/分隔）
-const yipinH5Data = [
-  {"name": "PH/HQW/P站", "h5": "https://ph.dwzec.com"},
-  {"name": "TT/TT/绿标抖音", "h5": "https://tt.uod839.com"},
-  {"name": "抖阴PRO/DYP/DYM", "h5": "https://cres.pah467.com"},
-  {"name": "抖阴PLUS/DYS", "h5": "https://dys.nut108.com"},
-  {"name": "性欲社/XYS/HJ", "h5": "https://hj.prv417.com"},
-  {"name": "色虎/SH", "h5": "https://sh.kazkxf.com/"},
-  {"name": "黄片网盘/PD", "h5": "https://pd.yei72.com"},
-  {"name": "淫客/YK/X-CHAT", "h5": "https://yk.juc17.com"},
-  {"name": "快播/KB", "h5": "https://kb.eqq448.com"},
-  {"name": "懂片帝/DPD", "h5": "https://dpd.vzz157.com"},
-  {"name": "N号房/NHF", "h5": "https://nhf.rqi564.com"},
-  {"name": "奥黛/黄神话金莲/HSHJL/THYJ/THAD", "h5": "https://thyj.owj474.com"},
-  {"name": "XVideos/XV", "h5": "https://xv.xta533.com"},
-  {"name": "知乎/18R/YJJ", "h5": "https://yjj.nzp721.com"},
-  {"name": "花花公子/HHGZ", "h5": "https://hhgz.jqq497.com"},
-  {"name": "痒视频/YSP", "h5": "https://cres.mvy797.com"},
-  {"name": "污漫社/WMS/JYS", "h5": "https://jys.hez980.com"},
-  {"name": "Onlyfans/OF", "h5": "https://of.qxv234.com/#/launch"},
-  {"name": "海角社区/小马拉大车/CHJ", "h5": "https://chj.zwb981.com"},
-  {"name": "小红书/FBI", "h5": "https://fbi.bb38j.cc"},
-  {"name": "稚嫩学园/职业私欲/AF", "h5": "https://af.psi744.com"},
-  {"name": "调教师/TJS", "h5": "https://tjs.etm422.com"},
-  {"name": "玩偶AV/WO", "h5": "https://wo.fxc367.com"},
-  {"name": "PH·Prem/BZMH(煲粥漫画)", "h5": "https://bzmh.xya477.com"},
-  {"name": "铁粉空间/TFKJ", "h5": "https://tfkj.1jorsi.com"},
-  {"name": "白嫖社(网页版)", "h5": "https://bps.cdq284.com"},
-  {"name": "台姬店/TJD", "h5": "https://tjd.grx492.com/#/circle"},
-  {"name": "好妻网(网页版)", "h5": "https://hao77.live"},
-  {"name": "魅魔VLOG/MMV", "h5": "https://mmv.xdx794.com/#/"},
-  {"name": "精日头条/JRTT", "h5": "https://jrtt.xdx794.com/"},
-  {"name": "99夜/TSDB", "h5": "https://tsdb.eyx680.com/"},
-  {"name": "寻情记/窈窑领先/YYLX", "h5": "https://yylx.q2orq0.com/#/"},
-  {"name": "成人Deepseek/DS", "h5": "https://ds.xvb435.com"},
-  {"name": "酥妻ultra/SQ", "h5": "https://sq.myu603.com"},
-  {"name": "拨阴/BY", "h5": "https://by.wbk181.com/#/"},
-  {"name": "骚穴宝/SXB/LLQ", "h5": "https://llq.goh389.com"},
-  {"name": "RG/RG", "h5": "https://rg.ouy58.com"},
-  {"name": "魅影/MY", "h5": "https://my.zvi518.com"},
-  {"name": "淫君子/YJZ", "h5": "https://yjz.lhj887.com"},
-  {"name": "性达人/XDR", "h5": "https://xdr.mbm105.com"},
-  {"name": "猫眼票房/MYY", "h5": "https://myy.shw241.com"},
-  {"name": "星淫短剧/XY", "h5": "https://xy.thb404.com"},
-  {"name": "七宗罪/Qzz", "h5": "https://qzz.wma370.com"},
-  {"name": "黄色小报/HSXB", "h5": "https://hsxb.ovb173.com"},
-  {"name": "潮汐映画/CXYH", "h5": "https://cxyh.rdu273.com"},
-  {"name": "嫖虫巴士/PCBS", "h5": "https://pcbs.wer799.com"},
-  {"name": "苍井空/CJK", "h5": "https://cjk.gay351.com"},
-  {"name": "18禁漫/SBJM", "h5": "https://sbjm.pbj911.com"}
-];
 
 function showSection(id, el) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1228,7 +1154,7 @@ function makeAiCard(p) {
 document.getElementById('ai-platforms').innerHTML = aiData.map(makeAiCard).join('');
 document.getElementById('ai-link-count').textContent = aiData.reduce((s,p)=>(p.dl?s+1:s)+(p.h5?1:0),0);
 
-// 初始化合并逸品section（站1+3+2+H5，此处 yipin3Data/yipinH5Data 均已声明）
+// 初始化合并逸品section（站1+3+2，此处 yipin3Data 已声明）
 renderYipin();
 
 function copyUrl(url) {
