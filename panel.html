@@ -836,7 +836,7 @@ const h5Full = { 'Niconico': 'https://niconicocn.com', '性癖': 'https://xpsp.q
 const verifyAlerts = {"date": "2026-07-19 07:19", "items": [{"name": "N号房", "type": "全民", "info": "打不开:HTTPSConnectionPool(host='nhf_"}]};
 // VERIFY_ALERTS_END
 // YIPIN_VERIFY_ALERTS_START
-const yipinVerifyAlerts = {"date": "2026-07-19 07:35", "items": [{"name": "PH·Prem", "type": "逸品站2", "info": "打不开:HTTPSConnectionPool(host='d1y9"}, {"name": "SM课堂", "type": "逸品站2", "info": "打不开:HTTPSConnectionPool(host='d2tl"}, {"name": "妻友会", "type": "逸品站2", "info": "打不开:HTTPSConnectionPool(host='d2tl"}]};
+const yipinVerifyAlerts = {"date": "2026-07-19 07:49", "items": [{"name": "酥妻ultra", "type": "逸品H5", "info": "打不开:HTTPSConnectionPool(host='sq.m"}]};
 // YIPIN_VERIFY_ALERTS_END
 
 let linkOverrides = {};  // { platform: { qm|qd|h5: url } }  来自 Supabase link_overrides 表
@@ -1009,7 +1009,7 @@ const yipin2Data = [
   {"name": "猫眼票房", "dl": "https://d1cvz2ol66sey.cloudfront.net", "h5": "https://myy.shw241.com"},
   {"name": "星淫", "dl": "https://d1u99xt4cadkpy.cloudfront.net", "h5": "https://xy.thb404.com"},
   {"name": "七宗罪", "dl": "https://d12enzgpvk0h2t.cloudfront.net", "h5": "https://qzz.wma370.com"},
-  {"name": "PH·Prem", "dl": "https://d1y9j22vxk9de7.cloudfront.net", "h5": "https://bzmh.xya477.com"},
+  {"name": "PH·Prem", "dl": "https://bzm101.com", "h5": "https://bzmh.xya477.com"},
   {"name": "铁粉空间", "dl": "https://d39f4g158zuzo7.cloudfront.net", "h5": "https://tfkj.1jorsi.com"},
   {"name": "酥妻ultra", "dl": "https://d25w9nwhj40j9p.cloudfront.net", "h5": "https://sq.myu603.com"},
   {"name": "幼甜", "dl": "https://ph888.phnqcb.com"},
@@ -1025,8 +1025,6 @@ const yipin2Data = [
   {"name": "欲见", "dl": "https://d3kodogrjivx6s.cloudfront.net"},
   {"name": "91淫妻", "dl": "https://d393fdsk1n9lr3.cloudfront.net"},
   {"name": "精日头条", "dl": "https://d1d1jiw2byebzk.cloudfront.net", "h5": "https://jrtt.xdx794.com/"},
-  {"name": "SM课堂", "dl": "https://d2tlydnokozs7l.cloudfront.net"},
-  {"name": "妻友会", "dl": "https://d2tlydnokozs7l.cloudfront.net"},
   {"name": "白嫖社(网页版)", "h5": "https://bps.cdq284.com"},
   {"name": "好妻网(网页版)", "h5": "https://hao77.live"}
 ];
@@ -1383,7 +1381,7 @@ async function doUploadYipin() {
   if(!sheet) throw new Error('找不到逸品标签页 gid='+YIPIN_GID);
   log(`标签页: ${sheet}`);
   const oVals = await readRange(token, YIPIN_ID, `${sheet}!O3:O300`);
-  const YIPIN_IGNORE = ['YYLX','YJZ','CMD','uu加速器','白嫖射','好妻网web'];  // 系统网址表无对应行，忽视不上传
+  const YIPIN_IGNORE = ['YYLX','YJZ','CMD','uu加速器','白嫖射','好妻网web','SM课堂','妻友会'];  // 系统网址表无对应行，忽视不上传
   const s1list = yipinData.filter(p=>p.name && p.dl && !YIPIN_IGNORE.includes(p.name));   // 站1平台，只配 O3-O21
   const s2list = yipin2Data.filter(p=>p.name && p.dl && !YIPIN_IGNORE.includes(p.name));  // 站2平台，只配 O22-O54
   // 好妻网 O 列的别名 → 面板平台名（补齐格式差异）
