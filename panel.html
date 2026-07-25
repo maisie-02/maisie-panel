@@ -1743,10 +1743,19 @@ async function fetchWeeklyReport() {
   lines.push('');
 
   // ① 当周早班全员加总（主指标）
+  // 待跟进改用客服反馈群实际「未处理」项(tgFollowups status==need，已扣除已处理)，按恒睿/逸品分。
+  // 原 totalPending 是各人日报「待跟进」逐日累加、含已处理→会虚高，不再用于展示。
+  const _fb = Array.isArray(tgFollowups) ? tgFollowups : [];
+  const _needCnt = grp => _fb.filter(it => {
+    const d = (it.createdAt || '').slice(0, 10);
+    return d >= start && d <= end && it.group === grp && it.status === 'need';
+  }).length;
+  const hrPending = _needCnt('恒睿'), ypPending = _needCnt('逸品');
   lines.push('【本周早班接线加总】');
   lines.push(`  恒睿总接线数：${totalHengrui} 条`);
   lines.push(`  逸品总接线数：${totalYipin} 条`);
-  lines.push(`  合计已解决：${totalSolved} 条 ｜ 待跟进：${totalPending} 条`);
+  lines.push(`  待跟进：恒睿 ${hrPending} 条 ｜ 逸品 ${ypPending} 条（已扣除已处理）`);
+  lines.push(`  合计已解决：${totalSolved} 条 ｜ 待跟进：${hrPending + ypPending} 条`);
   lines.push('');
 
   // ② 组员明细
