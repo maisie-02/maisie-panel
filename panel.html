@@ -1808,6 +1808,22 @@ async function fetchWeeklyReport() {
   }
   lines.push('');
 
+  // 死锁阻碍（模版四小节，用本周高频问题填充；对齐上周周报样本）
+  lines.push('【死锁阻碍】');
+  if (fbWeek.length && ranked.length) {
+    const topB = ranked.slice(0, 3).map(c => c.short);
+    lines.push(`-升级 / 求助（卡点描述）：主要卡点集中在${topB.join('、')}等高频问题。多数情况都需要用户补充地区、网络、设备型号、异常截图或录屏后，才能进一步反馈技术或运营人员协助追踪处理。`);
+    lines.push(`-需要上级介入的重点事项：目前暂无需要上级介入的重点事项。现阶段主要问题仍为${topB.join('、')}，已依照流程收集用户信息，并反馈技术或运营人员持续追踪。`);
+    lines.push('-等待时长：部分情况已持续一段时间，短期内暂时还没有明显改善。');
+    lines.push('-影响会话数 / 客户数：影响大多分散在多类日常用户问题中，目前已持续整理并追踪。');
+  } else {
+    lines.push('-升级 / 求助（卡点描述）：本周客服反馈群暂无恒睿/逸品记录。');
+    lines.push('-需要上级介入的重点事项：目前暂无需要上级介入的重点事项。');
+    lines.push('-等待时长：无。');
+    lines.push('-影响会话数 / 客户数：无。');
+  }
+  lines.push('');
+
   // 专项复盘（模版四小节）
   lines.push('【专项复盘】');
   if (fbWeek.length && ranked.length) {
