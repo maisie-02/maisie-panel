@@ -871,19 +871,25 @@ let linkOverrides = {};  // { platform: { qm|qd|h5: url } }  来自 Supabase lin
 function ovr(name, type, url){
   const o = linkOverrides[name] && linkOverrides[name][type];
   if (!o) return url;
-  return o.startsWith('PAUSE::') ? o.slice(7) : o;
+  if (o.startsWith('PAUSE::')) return o.slice(7);
+  if (o.startsWith('XLSX::')) return o.slice(6);
+  return o;
 }
 function isPaused(name, type){ const o = linkOverrides[name] && linkOverrides[name][type]; return !!(o && o.startsWith('PAUSE::')); }
-function isEdited(name, type){ const o = linkOverrides[name] && linkOverrides[name][type]; return !!(o && !o.startsWith('PAUSE::')); }
+function isXlsx(name, type){ const o = linkOverrides[name] && linkOverrides[name][type]; return !!(o && o.startsWith('XLSX::')); }
+function isEdited(name, type){ const o = linkOverrides[name] && linkOverrides[name][type]; return !!(o && !o.startsWith('PAUSE::') && !o.startsWith('XLSX::')); }
 function labelOf(type){ return type==='qm'?'全民代理':type==='qd'?'渠道代理':type==='dl'?'亚马逊下载':'H5链接'; }
 
 function makeRow(url, type, platform) {
   const label = labelOf(type);
   const paused = isPaused(platform, type);
+  const xlsx = isXlsx(platform, type);
   const edited = isEdited(platform, type);
   const mark = paused ? ' <span style="color:#2563eb;font-size:11px">(🔒已暂停覆盖)</span>'
-                      : (edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : '');
-  const pauseBtn = paused
+             : xlsx   ? ' <span style="color:#047857;font-size:11px">(📋xlsx来源)</span>'
+             : edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : '';
+  // xlsx来源 也是冻结覆盖(xlsx为主·持久)，给「恢复覆盖」按钮可清；其余可「暂停覆盖」
+  const pauseBtn = (paused || xlsx)
     ? `<button class="copy-btn" style="background:#dbeafe;color:#1e40af" onclick="resumeLink('${platform}','${type}')">恢复覆盖</button>`
     : `<button class="copy-btn" style="background:#f1f5f9;color:#475569" onclick="pauseLink('${platform}','${type}','${url}')">暂停覆盖</button>`;
   return `<li class="domain-item">
@@ -967,6 +973,7 @@ function _rerenderLinks(){ renderMain(); if (typeof renderYipin === 'function') 
 window.editLink = async function(platform, type){
   let cur = (linkOverrides[platform] && linkOverrides[platform][type]) || '';
   if (cur.startsWith('PAUSE::')) cur = cur.slice(7);
+  else if (cur.startsWith('XLSX::')) cur = cur.slice(6);
   const url = prompt(`修改「${dispName(platform)}」的${labelOf(type)}链接：\n（留空并确定 = 清除手改、恢复自动抓取）`, cur);
   if (url === null) return;
   if (!_sbo) { alert('未连接数据库，无法保存'); return; }
