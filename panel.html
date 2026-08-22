@@ -1,18 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-(function(){
-  const sb = supabase.createClient(
-    'https://kjfglthwocbzinkiyfxm.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZmdsdGh3b2Niemlua2l5ZnhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDA0ODMsImV4cCI6MjA5ODI3NjQ4M30.IDDfWZf0Q2DW2DTm6hmoPsQDsFmBzZmkZP1KKjxJct8'
-  );
-  sb.auth.getSession().then(({data:{session}})=>{
-    if(!session) window.location.href='index.html';
-  });
-})();
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>各平台最新下载链接</title>
@@ -243,6 +231,7 @@
   <div class="nav-item" id="nav-aiengine" onclick="showSection('aiengine',this)" style="display:none">AI引擎</div>
   <div class="nav-item" id="nav-nodomain" onclick="showSection('nodomain',this)">无启用域名</div>
   <div class="nav-item" id="nav-loufeng" onclick="showSection('loufeng',this)">楼凤更换记录</div>
+  <div class="nav-item" id="nav-ops" onclick="showSection('ops',this)">🛠 运维控制台</div>
   <div class="nav-group">
     <div class="nav-group-header collapsed" id="grp-header-report" onclick="toggleGroup('report')">
       数据报表 <span class="arrow">▾</span>
@@ -394,6 +383,42 @@
       </tr></thead>
       <tbody id="lf-tbody"></tbody>
     </table></div>
+  </div>
+
+  <!-- 运维控制台 -->
+  <div class="section" id="section-ops">
+    <div class="section-header-row">
+      <div class="main-header">🛠 运维控制台</div>
+      <span class="update-time section-update-time" id="ops-update" style="margin-left:auto;margin-right:12px;align-self:center;"></span>
+      <button class="copy-btn" onclick="opsRefresh()" style="align-self:center">刷新</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.8">
+      🟢 正常 · 🔴 已挂/失败 · 🟠 多实例(409) · 🔵 运行中 · ⚪ 未知 &nbsp;|&nbsp; 每 15 秒自动刷新，操作会记录你的账号。
+      <br>常驻bot崩溃通常会被保活自动拉起；<b>卡死/多实例</b>点【重启】，<b>某定时任务失败</b>点【重跑】，排查点【日志】。
+    </div>
+
+    <div class="main-header" style="font-size:15px;margin:6px 0 8px">常驻机器人</div>
+    <div style="overflow-x:auto"><table class="recharge-table" id="ops-bot-table">
+      <thead><tr><th style="width:70px">状态</th><th>机器人</th><th>说明</th><th>详情</th><th style="width:150px">操作</th></tr></thead>
+      <tbody id="ops-bot-tbody"><tr><td colspan="5" style="color:var(--text-secondary)">加载中…</td></tr></tbody>
+    </table></div>
+
+    <div class="main-header" style="font-size:15px;margin:20px 0 8px">每日定时任务</div>
+    <div style="overflow-x:auto"><table class="recharge-table" id="ops-task-table">
+      <thead><tr><th style="width:70px">状态</th><th>任务</th><th>说明</th><th>上次运行</th><th>详情</th><th style="width:120px">操作</th></tr></thead>
+      <tbody id="ops-task-tbody"><tr><td colspan="6" style="color:var(--text-secondary)">加载中…</td></tr></tbody>
+    </table></div>
+  </div>
+
+  <!-- 运维：结果/日志弹窗 -->
+  <div id="ops-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9999;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)opsCloseModal()">
+    <div style="background:var(--card-bg,#ffffff);color:var(--text-primary);max-width:900px;width:100%;max-height:80vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--header-border);display:flex;align-items:center;gap:10px">
+        <b id="ops-modal-title" style="flex:1">结果</b>
+        <button class="copy-btn" onclick="opsCloseModal()">关闭</button>
+      </div>
+      <pre id="ops-modal-body" style="margin:0;padding:16px;overflow:auto;font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word">…</pre>
+    </div>
   </div>
 
   <!-- 数据报表 -->
@@ -2658,6 +2683,109 @@ function renderLoufeng(){
   if(up) up.textContent = LOUFENG_UPDATED ? ('更新时间 '+LOUFENG_UPDATED) : '';
 }
 renderLoufeng();
+</script>
+
+<!-- ===== 运维控制台 ===== -->
+<script>
+(function(){
+  const OPS_URL = 'https://kjfglthwocbzinkiyfxm.supabase.co';
+  const OPS_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqZmdsdGh3b2Niemlua2l5ZnhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDA0ODMsImV4cCI6MjA5ODI3NjQ4M30.IDDfWZf0Q2DW2DTm6hmoPsQDsFmBzZmkZP1KKjxJct8';
+  let opsSb = null, opsEmail = '', opsBusy = false;
+
+  function ensureLib(){
+    return new Promise((res)=>{
+      if (typeof supabase !== 'undefined') return res(true);
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+      s.onload = ()=>res(true); s.onerror = ()=>res(false);
+      document.head.appendChild(s);
+    });
+  }
+  async function client(){
+    if (opsSb) return opsSb;
+    const ok = await ensureLib();
+    if (!ok || typeof supabase === 'undefined') return null;
+    opsSb = supabase.createClient(OPS_URL, OPS_ANON);
+    try { const {data} = await opsSb.auth.getSession(); opsEmail = data?.session?.user?.email || ''; } catch(e){}
+    return opsSb;
+  }
+
+  const EMO = {ok:'🟢', down:'🔴', failed:'🔴', multi:'🟠', running:'🔵', stale:'⚪', unknown:'⚪'};
+  function badge(st){ return (EMO[st]||'⚪'); }
+  function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  window.opsCloseModal = function(){ document.getElementById('ops-modal').style.display='none'; };
+  function showModal(title, body){
+    document.getElementById('ops-modal-title').textContent = title;
+    document.getElementById('ops-modal-body').textContent = body;
+    document.getElementById('ops-modal').style.display = 'flex';
+  }
+
+  window.opsRefresh = async function(){
+    const sb = await client();
+    const botB = document.getElementById('ops-bot-tbody');
+    const taskB = document.getElementById('ops-task-tbody');
+    if (!sb){ if(botB) botB.innerHTML='<tr><td colspan="5" style="color:#e53e3e">无法连接（未登录或库未加载）</td></tr>'; return; }
+    const {data, error} = await sb.from('ops_status').select('*');
+    if (error){ if(botB) botB.innerHTML='<tr><td colspan="5" style="color:#e53e3e">读取失败：'+esc(error.message)+'（表是否已建？）</td></tr>'; return; }
+    const bots = (data||[]).filter(r=>r.kind==='bot').sort((a,b)=>a.name.localeCompare(b.name));
+    const tasks = (data||[]).filter(r=>r.kind==='task').sort((a,b)=>a.name.localeCompare(b.name));
+    botB.innerHTML = bots.length ? bots.map(r=>`<tr>
+      <td style="font-size:16px">${badge(r.state)}</td>
+      <td><b>${esc(r.label||r.name)}</b><br><span style="font-size:11px;color:var(--text-secondary)">${esc(r.name)}</span></td>
+      <td style="font-size:12px">${esc(({ok:'正常',down:'已挂',multi:'多实例',running:'运行中'})[r.state]||r.state)}</td>
+      <td style="font-size:12px;color:var(--text-secondary)">${esc(r.detail||'')}</td>
+      <td><button class="copy-btn" onclick="opsCmd('restart','${esc(r.name)}','${esc(r.label||r.name)}')">重启</button>
+          <button class="copy-btn" onclick="opsCmd('fetchlog','${esc(r.name)}','${esc(r.label||r.name)}')">日志</button></td>
+    </tr>`).join('') : '<tr><td colspan="5" style="color:var(--text-secondary)">暂无数据（代理未运行或表未建）</td></tr>';
+    taskB.innerHTML = tasks.length ? tasks.map(r=>`<tr>
+      <td style="font-size:16px">${badge(r.state)}</td>
+      <td><b>${esc(r.label||r.name)}</b><br><span style="font-size:11px;color:var(--text-secondary)">${esc(r.name)}</span></td>
+      <td style="font-size:12px">${esc(({ok:'成功',failed:'失败',running:'运行中',unknown:'未知'})[r.state]||r.state)}</td>
+      <td style="font-size:12px;color:var(--text-secondary)">${esc((r.last_run||'').replace('T',' '))}</td>
+      <td style="font-size:12px;color:var(--text-secondary)">${esc(r.detail||'')}</td>
+      <td><button class="copy-btn" onclick="opsCmd('rerun','${esc(r.name)}','${esc(r.label||r.name)}')">重跑</button></td>
+    </tr>`).join('') : '<tr><td colspan="6" style="color:var(--text-secondary)">暂无数据</td></tr>';
+    const up = document.getElementById('ops-update');
+    if (up) up.textContent = '刷新于 ' + new Date().toLocaleTimeString();
+  };
+
+  window.opsCmd = async function(cmd, target, label){
+    if (opsBusy) return;
+    const verb = {restart:'重启', rerun:'重跑', fetchlog:'拉取日志'}[cmd] || cmd;
+    if (cmd !== 'fetchlog' && !confirm(`确定要${verb}「${label}」吗？`)) return;
+    const sb = await client();
+    if (!sb){ alert('未连接，请重新登录'); return; }
+    opsBusy = true;
+    showModal(`${verb}「${label}」`, '已提交，执行中…');
+    try {
+      const {data, error} = await sb.from('ops_commands')
+        .insert({cmd, target, requested_by: opsEmail || 'panel'}).select().single();
+      if (error){ showModal(`${verb}「${label}」`, '提交失败：'+error.message+'\n（ops_commands 表是否已建？）'); opsBusy=false; return; }
+      const id = data.id;
+      let tries = 0;
+      const poll = async ()=>{
+        tries++;
+        const {data:row} = await sb.from('ops_commands').select('status,result').eq('id', id).single();
+        if (row && (row.status==='done' || row.status==='error')){
+          const head = row.status==='done' ? '✅ 完成\n\n' : '❌ 出错\n\n';
+          showModal(`${verb}「${label}」`, head + (row.result||'(无返回)'));
+          opsBusy = false; opsRefresh(); return;
+        }
+        if (tries > 40){ showModal(`${verb}「${label}」`, '⏳ 超时未返回，代理可能未运行。请稍后刷新查看。'); opsBusy=false; return; }
+        setTimeout(poll, 1500);
+      };
+      setTimeout(poll, 1200);
+    } catch(e){ showModal(`${verb}「${label}」`, '异常：'+e); opsBusy=false; }
+  };
+
+  // 切到运维页时自动刷新 + 每 15s 自动刷新
+  if (typeof window.showSection === 'function'){
+    const _orig = window.showSection;
+    window.showSection = function(id, el){ _orig(id, el); if (id==='ops') opsRefresh(); };
+  }
+  setInterval(()=>{ const s=document.getElementById('section-ops'); if (s && s.classList.contains('active')) opsRefresh(); }, 15000);
+})();
 </script>
 </body>
 </html>
