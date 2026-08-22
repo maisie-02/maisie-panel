@@ -662,7 +662,7 @@ const mainData = [
   {name:'黄瓜社区', qm:'https://hgsq_qm_qq_257455_Q3L9GM69.39coqti.work',        qd:'https://hgsq_qd_ac_60378_QZV84MK2.t7yfz3zy.work'},
   {name:'鸡鸡向上', qm:'https://jjxs_sf_qm_369125_TEAASS10.m76svr8p.work',                        qd:'https://xpsp_qd_ac_60378_R5Y604R7.ltyr76fe.work'},
   {name:'拼好片',   qm:'https://php_qm_369125_8X4H3H56.r16z5ulo.work',   qd:'https://php_qd_603789_OY91ZHKR.qb1lkzkt.work'},
-  {name:'uu视频',   qm:'https://1.dsd33.cc',      qd:'https://1.dsd11.cc'},
+  {name:'uu视频',   qm:'RAND::dsd33.cc',      qd:'RAND::dsd11.cc'},
   {name:'热穴高校', qm:'https://rxgx_qm_369125_79OBLLII.1hhw027x.work',        qd:'https://rxgx_qd_603789_N6RJYS23.1xpuxyaf.work'},
   {name:'新鉴黄师', qm:'https://lly_qm_369125_883R1633.lzeb9zn9.work',                         qd:'https://lly_qd_603789_I280R62T.wl6xhzyi.work'},
   {name:'茶颜悦涩', qm:'https://svz-qm.g0ssznwn.work',                          qd:'https://svz-qd.n4r545uc.work'},
@@ -780,6 +780,8 @@ function rand6() {
   for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
   return s;
 }
+// qm/qd 值若为 'RAND::域名' → 渲染时补随机6位前缀(与H5同机制)：RAND::dsd33.cc → https://{rand6}.dsd33.cc
+function expandRand(v){ return (v && v.startsWith('RAND::')) ? `https://${rand6()}.${v.slice(6)}` : v; }
 
 // 显示名映射：内部 name 键保持不变（脚本/h5Suffixes/rechargeData 都靠它），只改面板显示
 const displayNames = {
@@ -904,8 +906,8 @@ function makeRow(url, type, platform) {
 }
 
 function makeCard(p) {
-  const qm = ovr(p.name, 'qm', p.qm);
-  const qd = ovr(p.name, 'qd', p.qd);
+  const qm = expandRand(ovr(p.name, 'qm', p.qm));
+  const qd = expandRand(ovr(p.name, 'qd', p.qd));
   let rows = '';
   if (qm) rows += makeRow(qm, 'qm', p.name);
   if (qd) rows += makeRow(qd, 'qd', p.name);
