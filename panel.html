@@ -1417,8 +1417,11 @@ async function doUploadHengrui() {
     const p = matchCell(cell);
     if(p){
       const row=i+2;
-      if(p.qm) updates.push({range:`${sheet}!E${row}`,values:[[p.qm]]});
-      if(p.qd) updates.push({range:`${sheet}!F${row}`,values:[[p.qd]]});
+      // 上传面板【显示值】：暂停覆盖=冻结链接、RAND::=展开随机前缀，别上传失效的后台/后缀原值
+      const qm = expandRand(ovr(p.name,'qm',p.qm));
+      const qd = expandRand(ovr(p.name,'qd',p.qd));
+      if(qm) updates.push({range:`${sheet}!E${row}`,values:[[qm]]});
+      if(qd) updates.push({range:`${sheet}!F${row}`,values:[[qd]]});
       matched++;
     } else {
       unmatched.push(cell.split('\n')[0].trim());
@@ -1432,7 +1435,8 @@ async function doUploadHengrui() {
     const p = matchCell(cell);
     if(p){
       const suffix = h5Suffixes[p.name];
-      const h5url = h5Full[p.name] || (suffix ? `https://${rand6()}.${suffix}` : null);
+      const fallback = h5Full[p.name] || (suffix ? `https://${rand6()}.${suffix}` : null);
+      const h5url = expandRand(ovr(p.name,'h5',fallback));   // 暂停覆盖时=冻结的能进链接，不上传失效后缀
       if(h5url) updates.push({range:`${sheet}!I${i+2}`,values:[[h5url]]});
     }
   }
