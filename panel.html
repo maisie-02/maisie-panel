@@ -1946,6 +1946,19 @@ async function fetchWeeklyReport() {
   }
   lines.push('');
 
+  // 下周动作（TOP2/TOP3/排班常设；TOP1与话术优先用 AI 缓存，否则通用兜底）
+  lines.push('【下周动作】');
+  if (aiC && aiC.next && aiC.next.length) {
+    aiC.next.forEach(l => lines.push(l));
+  } else {
+    lines.push('-优先级 TOP 1：持续跟进本周高频异常的处理进度，推动技术给出根因与修复时间，并加强异常的批量汇整与反馈效率。');
+    lines.push('-优先级 TOP 2：客服对话质检、监测 AI 客服回复内容与准确度。');
+    lines.push('-优先级 TOP 3：协助组员 AGENT 专案开发、优化。');
+    lines.push('-话术 / FAQ 更新计划：针对本周暴露的话术或流程漏洞进行优化调整，减少繁杂流程、提高客服警觉性，确保相似问题第一时间统一回报。');
+    lines.push('-排班 / 人员调配：早班 5/5。');
+  }
+  lines.push('');
+
   // 问题明细（备查，可删）——各类别实际反馈，方便手工微调高频问题与复盘
   if (fbWeek.length) {
     lines.push('—————— 以下为问题明细（备查，可删） ——————');
