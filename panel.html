@@ -294,6 +294,7 @@
     <div class="section-header-row">
       <div class="main-header">各平台最新下载链接</div>
       <span class="update-time section-update-time" style="margin-left:auto;margin-right:12px;align-self:center;"></span>
+      <button class="upload-btn" style="background:#059669;margin-right:8px" onclick="addPlatform('hengrui')">➕ 新增平台</button>
       <button class="upload-btn" onclick="openUpload('hengrui')">一键上传表单</button>
     </div>
     <div class="stats">
@@ -322,6 +323,7 @@
     <div class="section-header-row">
       <div class="main-header">逸品站2 下载链接</div>
       <span class="update-time section-update-time" style="margin-left:auto;margin-right:12px;align-self:center;"></span>
+      <button class="upload-btn" style="background:#059669;margin-right:8px" onclick="addPlatform('yipin')">➕ 新增平台</button>
       <button class="upload-btn" onclick="openUpload('yipin')">一键上传表单</button>
     </div>
     <div class="stats">
@@ -924,17 +926,29 @@ function makeCard(p) {
   const h5url = ovr(p.name, 'h5', h5Full[p.name] || (suffix ? `https://${rand6()}.${suffix}` : null));
   if (h5url) rows += makeRow(h5url, 'h5', p.name);
   const count = (qm ? 1 : 0) + (qd ? 1 : 0) + (h5url ? 1 : 0);
+  const manualTag = p.__manual__
+    ? ` <span style="color:#059669;font-size:11px">·手动新增</span> <button class="copy-btn" style="background:#fee2e2;color:#b91c1c" onclick="removePlatform('${p.name}','hengrui')">删除平台</button>` : '';
+  if (p.__manual__ && !rows) rows = `<li class="domain-item"><span class="no-domain" style="flex:1">暂无链接（上传表单/后台更新时按名称自动填）</span>
+    <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${p.name}','qm')">手填全民</button>
+    <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${p.name}','qd')">手填渠道</button>
+    <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${p.name}','h5')">手填H5</button></li>`;
   return `<div class="platform-card">
-    <div class="platform-name">${dispName(p.name)} <span class="badge ok">✓ ${count}条</span></div>
+    <div class="platform-name">${dispName(p.name)} <span class="badge ${count?'ok':''}">✓ ${count}条</span>${manualTag}</div>
     <ul class="domain-list">${rows}</ul>
   </div>`;
 }
 
 const allData = [...mainData, ...otherData];
+// 手动新增平台（存在 link_overrides 里 type='__manual__' 的标记行，url=区段）；随覆盖加载填充
+let manualPlatforms = { hengrui: [], yipin: [] };
+function manualCards(section, shape){
+  return (manualPlatforms[section] || []).map(n => Object.assign({ name: n, __manual__: true }, shape));
+}
 function renderMain(){
-  document.getElementById('main-platforms').innerHTML = allData.map(makeCard).join('');
+  const list = allData.concat(manualCards('hengrui', { qm:null, qd:null }));
+  document.getElementById('main-platforms').innerHTML = list.map(makeCard).join('');
   document.getElementById('main-link-count').textContent =
-    allData.reduce((s, p) => s + (ovr(p.name,'qm',p.qm) ? 1 : 0) + (ovr(p.name,'qd',p.qd) ? 1 : 0) + (h5Suffixes[p.name] ? 1 : 0), 0);
+    list.reduce((s, p) => s + (ovr(p.name,'qm',p.qm) ? 1 : 0) + (ovr(p.name,'qd',p.qd) ? 1 : 0) + ((h5Full[p.name]||h5Suffixes[p.name]||ovr(p.name,'h5',null)) ? 1 : 0), 0);
 }
 renderMain();
 
@@ -977,6 +991,20 @@ async function loadOverrides(){
     if (error) { console.warn('overrides load:', error.message); return; }
     linkOverrides = {};
     (data || []).forEach(r => { (linkOverrides[r.platform] = linkOverrides[r.platform] || {})[r.type] = r.url; });
+    // 手动新增平台 = 有覆盖行、但不在面板烘焙名单里的平台。区段：有 dl 覆盖=逸品，否则=恒睿。
+    // （新增时写一条空url标记行登记：恒睿=空qm、逸品=空dl；空url约束允许、渲染忽略，只用于登记+区分区段）
+    const baked = new Set([].concat(
+      (typeof mainData!=='undefined'?mainData:[]).map(p=>p.name),
+      (typeof otherData!=='undefined'?otherData:[]).map(p=>p.name),
+      (typeof yipinData!=='undefined'?yipinData:[]).map(p=>p.name),
+      (typeof yipin2Data!=='undefined'?yipin2Data:[]).map(p=>p.name),
+      (typeof yipin3Data!=='undefined'?yipin3Data:[]).map(p=>p.name)));
+    manualPlatforms = { hengrui: [], yipin: [] };
+    Object.keys(linkOverrides).forEach(name => {
+      if (baked.has(name)) return;
+      const sec = ('dl' in linkOverrides[name]) ? 'yipin' : 'hengrui';
+      manualPlatforms[sec].push(name);
+    });
     renderMain();
     if (typeof renderYipin === 'function') renderYipin();
   } catch(e) { console.warn(e); }
@@ -1028,6 +1056,46 @@ window.resumeLink = async function(platform, type){
     if (linkOverrides[platform]) delete linkOverrides[platform][type];
     _rerenderLinks();
   } catch(e) { alert('恢复失败：' + e.message); }
+};
+
+// ── 新增平台：写 link_overrides 一条标记行(type='__manual__', url=区段)登记；链接可当场手填、也可留空等按名字匹配 ──
+window.addPlatform = async function(section){
+  if (!_sbo) { alert('未连接数据库，无法保存'); return; }
+  const secName = section === 'yipin' ? '逸品站2' : '恒睿';
+  const name = (prompt(`新增平台到「${secName}」\n\n输入平台名称（务必与表单/后台里的软件名一致，才能按名字自动匹配更新链接）：`) || '').trim();
+  if (!name) return;
+  const exist = [].concat(
+    (typeof mainData !== 'undefined' ? mainData : []).map(p => p.name),
+    (typeof otherData !== 'undefined' ? otherData : []).map(p => p.name),
+    (typeof yipinData !== 'undefined' ? yipinData : []).map(p => p.name),
+    (typeof yipin2Data !== 'undefined' ? yipin2Data : []).map(p => p.name),
+    manualPlatforms.hengrui, manualPlatforms.yipin);
+  if (exist.includes(name)) { alert(`「${name}」已存在于面板，未新增。`); return; }
+  try {
+    // 登记标记：恒睿写空 qm、逸品写空 dl（空url=占位不渲染，用于登记+区分区段）
+    const markType = section === 'yipin' ? 'dl' : 'qm';
+    const { error } = await _sbo.from('link_overrides').upsert(
+      { platform: name, type: markType, url: '', updated_at: new Date().toISOString() },
+      { onConflict: 'platform,type' });
+    if (error) { alert('新增失败，未写入数据库：\n' + error.message); return; }
+    const types = section === 'yipin' ? [['dl','落地页'],['h5','H5链接']] : [['qm','全民代理'],['qd','渠道代理'],['h5','H5链接']];
+    for (const [t, lbl] of types) {
+      const u = (prompt(`（可留空）「${name}」的${lbl}链接：\n留空 = 不填，之后上传表单/后台更新时按名字自动填。`) || '').trim();
+      if (u) await _sbo.from('link_overrides').upsert({ platform: name, type: t, url: u, updated_at: new Date().toISOString() }, { onConflict: 'platform,type' });
+    }
+    await loadOverrides();
+    alert(`✅ 已新增「${name}」到${secName}。\n没填的链接会在下次上传表单/后台更新时按名字自动匹配填入。`);
+  } catch(e) { alert('新增失败：' + e.message); }
+};
+
+// ── 删除手动新增的平台：清掉标记行 + 它的所有链接覆盖 ──
+window.removePlatform = async function(name, section){
+  if (!_sbo) { alert('未连接数据库，无法保存'); return; }
+  if (!confirm(`删除手动新增的平台「${name}」？\n将从面板移除，并清掉它的所有链接覆盖。`)) return;
+  try {
+    await _sbo.from('link_overrides').delete().eq('platform', name);
+    await loadOverrides();
+  } catch(e) { alert('删除失败：' + e.message); }
 };
 loadOverrides();
 
@@ -1167,25 +1235,31 @@ function makeYipinRow(name, type, tagClass, tagLabel, url0) {
 
 function makeYipinCard(p) {
   let rows = '';
-  if (p.dl) rows += makeYipinRow(p.name, 'dl', 'dl', '亚马逊', p.dl);
-  if (p.h5) rows += makeYipinRow(p.name, 'h5', 'h5', 'H5链接', p.h5);
+  if (ovr(p.name, 'dl', p.dl)) rows += makeYipinRow(p.name, 'dl', 'dl', '亚马逊', p.dl);
+  if (ovr(p.name, 'h5', p.h5)) rows += makeYipinRow(p.name, 'h5', 'h5', 'H5链接', p.h5);
+  const manualTag = p.__manual__
+    ? ` <span style="color:#059669;font-size:11px">·手动新增</span> <button class="copy-btn" style="background:#fee2e2;color:#b91c1c" onclick="removePlatform('${p.name}','yipin')">删除平台</button>` : '';
+  if (p.__manual__ && !rows) rows = `<li class="domain-item"><span class="no-domain" style="flex:1">暂无链接（上传表单/后台更新时按名称自动填）</span>
+    <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${p.name}','dl')">手填落地页</button>
+    <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${p.name}','h5')">手填H5</button></li>`;
   return `<div class="platform-card">
-    <div class="platform-name">${p.name} <span class="badge ok">✓</span></div>
+    <div class="platform-name">${p.name} <span class="badge ok">✓</span>${manualTag}</div>
     <ul class="domain-list">${rows || '<li class="domain-item"><span class="no-domain">暂无链接</span></li>'}</ul>
   </div>`;
 }
 
 // 重渲染所有逸品容器（站1独立 / 站2独立 / 合并视图站1+3+2），供覆盖加载后与编辑后刷新
 function renderYipin() {
+  const yp2 = yipin2Data.concat(manualCards('yipin', { dl:null, h5:null }));   // 站2 + 手动新增逸品
   const z1 = yipinData.map(makeYipinCard).join('');
-  const z2 = yipin2Data.map(makeYipinCard).join('');
+  const z2 = yp2.map(makeYipinCard).join('');
   const z3 = (typeof yipin3Data !== 'undefined' ? yipin3Data : []).map(makeYipinCard).join('');
   const set = (id, html) => { const e = document.getElementById(id); if (e) e.innerHTML = html; };
   const num = (id, n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
   set('yipin-platforms', z1);   num('yipin-link-count', yipinData.length);
-  set('yipin2-platforms', z2);  num('yipin2-link-count', yipin2Data.length);
+  set('yipin2-platforms', z2);  num('yipin2-link-count', yp2.length);
   set('yipin-all-z1', z1);      set('yipin-all-z2', z2);   set('yipin-all-z3', z3);
-  const all = yipinData.concat(yipin2Data, typeof yipin3Data !== 'undefined' ? yipin3Data : []);
+  const all = yipinData.concat(yp2, typeof yipin3Data !== 'undefined' ? yipin3Data : []);
   const links = all.filter(p => p.dl).length + all.filter(p => p.h5).length;
   num('yipin-all-count', all.length); num('yipin-all-link-count', links);
 }
