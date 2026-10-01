@@ -1439,9 +1439,10 @@ async function doUploadHengrui() {
   log(`标签页: ${sheet}`);
   const dVals = await readRange(token, HENGRUI_ID, `${sheet}!D2:D300`);
   const hVals = await readRange(token, HENGRUI_ID, `${sheet}!H2:H300`);
-  // 每个平台的可匹配名称：主名(displayNames) + 别名 + 短名
+  // 每个平台的可匹配名称：主名(displayNames) + 别名 + 短名。含手动新增/表单上架平台，否则会误报「面板里没有」。
   const platNames = [];
-  for(const p of [...mainData,...otherData]){
+  const _manualHR = (typeof manualCards==='function') ? manualCards('hengrui',{qm:null,qd:null}) : [];
+  for(const p of [...mainData,...otherData,..._manualHR]){
     const full = (typeof displayNames!=='undefined' && displayNames[p.name]) || p.name;
     const mm = full.match(/^(.*?)[（(]([^）)]*)[）)]\s*$/);
     const primary = mm ? mm[1].trim() : full;
