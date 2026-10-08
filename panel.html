@@ -228,6 +228,7 @@
     <div class="nav-group-items" id="grp-items-dl">
       <div class="nav-item sub active" id="nav-download" onclick="showSection('download',this)">恒睿</div>
       <div class="nav-item sub" id="nav-yipin-all" onclick="showSection('yipin-all',this)">逸品</div>
+      <div class="nav-item sub" id="nav-yueda" onclick="showSection('yueda',this)">悦达</div>
     </div>
   </div>
   <div class="nav-item" id="nav-aiengine" onclick="showSection('aiengine',this)" style="display:none">AI引擎</div>
@@ -629,6 +630,19 @@
     <div id="yipin-all-z2"></div>
   </div>
 
+  <!-- 悦达 -->
+  <div class="section" id="section-yueda">
+    <div class="section-header-row">
+      <div class="main-header">悦达 下载链接</div>
+      <span class="update-time section-update-time" id="yueda-update-time" style="margin-left:auto;align-self:center;"></span>
+    </div>
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num" id="yueda-count">-</div><div class="stat-label">平台总数</div></div>
+      <div class="stat-card"><div class="stat-num" id="yueda-link-count">-</div><div class="stat-label">链接总数</div></div>
+    </div>
+    <div id="yueda-platforms"></div>
+  </div>
+
 </div>
 
 <div class="toast" id="toast">已复制到剪贴板</div>
@@ -1009,9 +1023,10 @@ async function loadOverrides(){
     });
     renderMain();
     if (typeof renderYipin === 'function') renderYipin();
+    if (typeof renderYueda === 'function') renderYueda();
   } catch(e) { console.warn(e); }
 }
-function _rerenderLinks(){ renderMain(); if (typeof renderYipin === 'function') renderYipin(); }
+function _rerenderLinks(){ renderMain(); if (typeof renderYipin === 'function') renderYipin(); if (typeof renderYueda === 'function') renderYueda(); }
 
 window.editLink = async function(platform, type){
   let cur = (linkOverrides[platform] && linkOverrides[platform][type]) || '';
@@ -1270,6 +1285,99 @@ document.getElementById('yipin-link-count').textContent = yipinData.length;
 
 // 逸品站3（备案表 I/J，由脚本从备案表更新；显示在合并视图「站1+3」区）
 const yipin3Data = [];
+
+// ── 悦达（由 yueda_update.py 读源头群 [Yes] 小串生成；格式同逸品，用 dl 存下载链接）──
+// YUEDA_DATA_START
+const yuedaUpdatedAt = "2026-10-08 11:57";
+const yuedaData = [
+  {"name": "51品茶", "dl": "https://0904.ocvnxjvys.cc"},
+  {"name": "小蓝俱乐部", "dl": "https://f77a.vmodrrcz.cc"},
+  {"name": "GTV", "dl": "https://4531.vnvhrcqkj.cc"},
+  {"name": "果冻传媒APP", "dl": "https://bce0.ijmlyrmt.cc"},
+  {"name": "新版滴滴", "dl": "https://9c4.dfsvcedr.cc"},
+  {"name": "51吃瓜", "dl": "https://7df.bomvyqxvo.cc"},
+  {"name": "51动漫", "dl": "https://d52.eqtgiamq.cc"},
+  {"name": "GiliGili", "dl": "https://1d79.ulbjbeipc.cc"},
+  {"name": "AI引擎", "dl": "https://67460.yejjndwb.com"},
+  {"name": "TikTok成人版", "dl": "https://138.hjdsededz.cc"},
+  {"name": "抖音Max", "dl": "https://4a7.dkbwknfgn.cc"},
+  {"name": "51成人破解", "dl": "https://4c7d.slxqvxqd.com"},
+  {"name": "禁漫天堂", "dl": "https://dc8.nuwuoxnwk.com"},
+  {"name": "91抖阴破解版", "dl": "https://a4607.tmazvjft.cc"},
+  {"name": "Xvideo免费版", "dl": "https://dae.fzgponbdz.com"},
+  {"name": "黄色仓库", "dl": "https://6002.dkvigaoy.cc"},
+  {"name": "搜同", "dl": "https://421.xzztxhix.cc"},
+  {"name": "51TikTok破解", "dl": "https://3c223.eeybplkli.cc"},
+  {"name": "51推特X破解", "dl": "https://54c.sjlenkjs.cc"},
+  {"name": "51视频app", "dl": "https://4519.ojrkcwyfk.cc"},
+  {"name": "妻友", "dl": "https://1be89e.ujixbhqte.cc"},
+  {"name": "51看片", "dl": "https://68c21.wdixikpt.cc"},
+  {"name": "50度灰", "dl": "https://ea64f0.nojiiomcg.cc"},
+  {"name": "51av破解", "dl": "https://1350.arkizbnnb.cc"},
+  {"name": "Pornhub免费版", "dl": "https://aacb7.aspwcdpij.cc"},
+  {"name": "蚂蚁", "dl": "https://901f.comhreczo.cc"},
+  {"name": "91短视频", "dl": "https://861635.zshuuagp.cc"},
+  {"name": "91AV", "dl": "https://666e.yurtnaetp.cc"},
+  {"name": "汤头条", "dl": "https://4947.ykryrnnq.cc"},
+  {"name": "洛丽塔", "dl": "https://7ddc5.dbmhijfwj.cc"},
+  {"name": "91porna", "dl": "https://00d39.hbdiouflk.cc"},
+  {"name": "海角社区", "dl": "https://ba33af.kplvbozm.cc"},
+  {"name": "黄果短剧[DX-147]", "dl": "https://bf36.bfvtuuuu.cc"},
+  {"name": "芒果短剧", "dl": "https://e2f.rhlvgzam.cc"},
+  {"name": "暗网禁区", "dl": "https://4cf6.jldbahsxj.cc"},
+  {"name": "黄果短剧[DX-161]", "dl": "https://a99.anuernzct.cc"},
+  {"name": "红果剧场", "dl": "https://fe72.fanqieapp.vip"},
+  {"name": "黄果漫剧", "dl": "https://6aeb2.huangguotoon.com"},
+  {"name": "AIporn", "dl": "https://0ac1.ltnjsajpb.cc"},
+  {"name": "91pornmv_web直连", "dl": "https://aa292.byqoebds.cc"},
+  {"name": "黑料社", "dl": "https://3de9.yofexrfbb.cc"},
+  {"name": "91PORN", "dl": "https://6577.gyoneokdf.cc"},
+  {"name": "P站中文版", "dl": "https://180982.fzcaoxcz.cc"},
+  {"name": "YouTube成人版", "dl": "https://a430d.fnpcpnwys.cc"},
+  {"name": "好色TV_web", "dl": "https://9834.lnksbsxjy.cc"},
+  {"name": "搜同gay_web", "dl": "https://5bb2.ntykyvln.cc"},
+  {"name": "小蓝视频网_web_直连", "dl": "https://7063a.iuudsmodz.cc"},
+  {"name": "91视频vx web直连（GA）", "dl": "https://89d758.clqagmnef.cc"},
+  {"name": "男同网web_直连", "dl": "https://579d9.wejnyrxq.cc"},
+  {"name": "黑料情报局sns_web直连", "dl": "https://c736d7.rkwmalnf.cc"},
+  {"name": "91探花web_zl", "dl": "https://0d3515.dgdhwcfor.cc"},
+  {"name": "爱交网_ZL", "dl": "https://02b8.icmkgyxfl.cc"},
+  {"name": "DX-065-91pornmv-v2", "dl": "https://a01a5.kbdtzdrha.cc"},
+  {"name": "dx-118禁漫天堂app", "dl": "https://7d302.coucdnqcc.cc"},
+  {"name": "东南亚-直连1", "dl": "https://785d.jzeyuwpas.cc"},
+  {"name": "海角", "dl": "https://67c7.rpwrvhhd.cc"},
+  {"name": "PornHub", "dl": "https://506522.qsjadtpp.cc"},
+  {"name": "男同网", "dl": "https://5de77.fyesnjaix.cc"},
+  {"name": "樱花动漫盒子", "dl": "https://90b77f.cnizxcsop.cc"},
+  {"name": "吃瓜曝光网-ZL", "dl": "https://5956.snhrwsqg.cc"},
+  {"name": "91情报局直连_ZL", "dl": "https://044bb.lpmiwvoa.cc"},
+  {"name": "91女同_zl", "dl": "https://d120.muefuakk.cc"},
+  {"name": "油管破解", "dl": "https://6248.qgwwncye.cc"},
+  {"name": "哔咔漫画_zl", "dl": "https://c6704.unhkzroz.cc"},
+  {"name": "黄果短剧_zl", "dl": "https://3133f0.vchllzwu.cc"},
+  {"name": "91成人免费版", "dl": "https://1f0f2.hvoksrpzd.cc"},
+  {"name": "91成人免费[pdd]", "dl": "https://b7de4b.brwonaei.cc"},
+  {"name": "51禁漫_zl", "dl": "https://0f2e7f.uarijnlu.cc"},
+  {"name": "痴汉俱乐部_zl", "dl": "https://1d77.hogjmrgk.cc"},
+  {"name": "红果吃瓜网_zl", "dl": "https://2293.fbifdjea.cc"},
+  {"name": "黄果短剧147", "dl": "https://88c04.sdlgdgqq.cc"},
+  {"name": "黄果短剧", "dl": "https://9334.ryrufcfuu.cc"},
+  {"name": "黄果漫剧_zl", "dl": "https://5a3e.lwgzlahah.cc"},
+  {"name": "鉴黄师", "dl": "https://129f1c.uexiynpnp.cc"},
+  {"name": "蓝果短剧", "dl": "https://36215b.agwhxskih.cc"},
+  {"name": "禁果短剧", "dl": "https://cd61.kpiaiiyes.cc"}
+];
+// YUEDA_DATA_END
+function renderYueda(){
+  const el = document.getElementById('yueda-platforms');
+  if(!el) return;
+  el.innerHTML = yuedaData.length ? yuedaData.map(makeYipinCard).join('')
+    : '<div style="color:#6b7280;font-size:13px;padding:20px 0">悦达数据尚未生成</div>';
+  const cnt = document.getElementById('yueda-count'); if(cnt) cnt.textContent = yuedaData.length;
+  const lc = document.getElementById('yueda-link-count'); if(lc) lc.textContent = yuedaData.filter(p=>p.dl||p.h5).length;
+  const ut = document.getElementById('yueda-update-time'); if(ut) ut.textContent = yuedaUpdatedAt ? ('更新于 '+yuedaUpdatedAt) : '';
+}
+renderYueda();
 
 
 function showSection(id, el) {
