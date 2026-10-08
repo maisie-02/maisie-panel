@@ -1368,10 +1368,18 @@ const yuedaData = [
   {"name": "禁果短剧", "dl": "https://cd61.kpiaiiyes.cc"}
 ];
 // YUEDA_DATA_END
+// 悦达专属卡片：直接显示源头链接(每小时自动刷新)，不走 ovr 覆盖(避免与恒睿/逸品同名平台撞车)
+function makeYuedaCard(p){
+  const url = p.dl || '';
+  const row = url
+    ? `<li class="domain-item"><span class="type-tag dl">下载链接</span><span class="domain-url"><a href="${url}" target="_blank">${url}</a></span><button class="copy-btn" onclick="copyUrl('${url}')">复制</button></li>`
+    : '<li class="domain-item"><span class="no-domain">暂无链接</span></li>';
+  return `<div class="platform-card"><div class="platform-name">${p.name} <span class="badge ok">✓</span></div><ul class="domain-list">${row}</ul></div>`;
+}
 function renderYueda(){
   const el = document.getElementById('yueda-platforms');
   if(!el) return;
-  el.innerHTML = yuedaData.length ? yuedaData.map(makeYipinCard).join('')
+  el.innerHTML = yuedaData.length ? yuedaData.map(makeYuedaCard).join('')
     : '<div style="color:#6b7280;font-size:13px;padding:20px 0">悦达数据尚未生成</div>';
   const cnt = document.getElementById('yueda-count'); if(cnt) cnt.textContent = yuedaData.length;
   const lc = document.getElementById('yueda-link-count'); if(lc) lc.textContent = yuedaData.filter(p=>p.dl||p.h5).length;
