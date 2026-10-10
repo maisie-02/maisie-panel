@@ -229,6 +229,7 @@
       <div class="nav-item sub active" id="nav-download" onclick="showSection('download',this)">恒睿</div>
       <div class="nav-item sub" id="nav-yipin-all" onclick="showSection('yipin-all',this)">逸品</div>
       <div class="nav-item sub" id="nav-yueda" onclick="showSection('yueda',this)">悦达</div>
+    <div class="nav-item sub" id="nav-dingfeng" onclick="showSection('dingfeng',this)">鼎丰</div>
     </div>
   </div>
   <div class="nav-item" id="nav-aiengine" onclick="showSection('aiengine',this)" style="display:none">AI引擎</div>
@@ -643,6 +644,19 @@
     <div id="yueda-platforms"></div>
   </div>
 
+  <!-- 鼎丰 -->
+  <div class="section" id="section-dingfeng">
+    <div class="section-header-row">
+      <div class="main-header">鼎丰 下载链接</div>
+      <span class="update-time section-update-time" id="dingfeng-update-time" style="margin-left:auto;align-self:center;"></span>
+    </div>
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num" id="dingfeng-count">-</div><div class="stat-label">平台总数</div></div>
+      <div class="stat-card"><div class="stat-num" id="dingfeng-link-count">-</div><div class="stat-label">链接总数</div></div>
+    </div>
+    <div id="dingfeng-platforms"></div>
+  </div>
+
 </div>
 
 <div class="toast" id="toast">已复制到剪贴板</div>
@@ -1024,9 +1038,10 @@ async function loadOverrides(){
     renderMain();
     if (typeof renderYipin === 'function') renderYipin();
     if (typeof renderYueda === 'function') renderYueda();
+    if (typeof renderDingfeng === 'function') renderDingfeng();
   } catch(e) { console.warn(e); }
 }
-function _rerenderLinks(){ renderMain(); if (typeof renderYipin === 'function') renderYipin(); if (typeof renderYueda === 'function') renderYueda(); }
+function _rerenderLinks(){ renderMain(); if (typeof renderYipin === 'function') renderYipin(); if (typeof renderYueda === 'function') renderYueda(); if (typeof renderDingfeng === 'function') renderDingfeng(); }
 
 window.editLink = async function(platform, type){
   let cur = (linkOverrides[platform] && linkOverrides[platform][type]) || '';
@@ -1370,6 +1385,134 @@ function renderYueda(){
   const ut = document.getElementById('yueda-update-time'); if(ut) ut.textContent = yuedaUpdatedAt ? ('更新于 '+yuedaUpdatedAt) : '';
 }
 renderYueda();
+
+// ── 鼎丰（由 dingfeng_update.py 读鼎丰【资料登记】表「产品分配明细」生成；dl=产品落地页）──
+// DINGFENG_DATA_START
+const dingfengUpdatedAt = "2026-10-10 12:51";
+const dingfengData = [
+  {"name": "XVIDEOS【SF01】", "dl": "https://ouddrx.mdt35xcauc.cc/ECOIFNFK", "st": "上渠道"},
+  {"name": "YourPorn【SF08】", "dl": "https://az0qmjlxs.z2mvs8uhr.cc/50KW7LD1", "st": "上渠道"},
+  {"name": "十八摸【SF15】", "dl": "https://vga9kol.pztbvx2h.cc/O8J22B38", "st": "上渠道"},
+  {"name": "18岁【SF53】", "dl": "https://uqrauka3a.kwsx68ab6.cc/UQAB4R6G", "st": "上渠道"},
+  {"name": "葫芦娃【SF55】", "dl": "https://hmiq22718.k2fydndn.cc/0WB9JOAM", "st": "上渠道"},
+  {"name": "黄瓜破解【SF43】", "dl": "https://huanggpj.vip", "st": "上渠道"},
+  {"name": "SWAG【SF54】", "dl": "https://swag2.onl", "st": "上渠道"},
+  {"name": "麻豆免费版【SF69】", "dl": "https://mad.vin", "st": "上渠道"},
+  {"name": "91Pornhub【SF74】", "dl": "https://91pron5.fun", "st": "上渠道"},
+  {"name": "哔哩破解【SF162】", "dl": "https://libilibi7.vip", "st": "上渠道"},
+  {"name": "豆包看片【DFA-01】", "dl": "https://baodou.win", "st": "下渠道"},
+  {"name": "性巴克【AI-07】", "dl": "https://xbk.lol/", "st": "下渠道"},
+  {"name": "51porn【AI-10】", "dl": "https://51porn.icu", "st": "下渠道"},
+  {"name": "香蕉破解版【SF81】", "dl": "https://xjpjb.fans", "st": "上渠道"},
+  {"name": "樱桃VLOG【SF76】", "dl": "https://ytvlog.cc", "st": "上渠道"},
+  {"name": "推特破解【SF78】", "dl": "https://ttpj.me/", "st": "上渠道"},
+  {"name": "91蜜桃【SF131】", "dl": "https://91mt01.com", "st": "上渠道"},
+  {"name": "faeone【AI25】", "dl": "https://faeone.com", "st": "开发中"},
+  {"name": "91+【AI-02】", "dl": "https://e3a93b26.dfaixnsaas.cc/AI02000", "st": "开发中"},
+  {"name": "18短视频【AI-11】", "dl": "https://18dsp.app/", "st": "开发中"},
+  {"name": "蜜桃免费版【SF68】", "dl": "http://mtmf.tw/", "st": "上渠道"},
+  {"name": "糖心破解版【SF42】", "dl": "http://phapp.me/", "st": "上渠道"},
+  {"name": "pornhub【SF143】", "dl": "http://phapp.me/", "st": "上渠道"},
+  {"name": "TiMi破解版【SF91】", "dl": "http://tmpjb.cc/", "st": "上渠道"},
+  {"name": "乱伦日记【SF72】", "dl": "https://luanlunriji.com/", "st": "上渠道"},
+  {"name": "豆包成人版【SF92】", "dl": "doubao8.cc", "st": "上渠道"},
+  {"name": "片多多破解版【SF93】", "dl": "pdd01.com", "st": "上渠道"},
+  {"name": "红果破解【SF117】", "dl": "https://HGPJ.cc", "st": "上渠道"},
+  {"name": "霸王插姬【SF134】", "dl": "http://bwcj.one", "st": "上渠道"},
+  {"name": "姨太坊【SF27】", "dl": "https://y4d.yttxnm5wf.cc/YGDUI9DZEU", "st": "上渠道"},
+  {"name": "奶糖Baby【SF126】", "dl": "https://f4yk.pjfwj7h7vu.cc", "st": "上渠道"},
+  {"name": "推特·中国【SF128】", "dl": "https://ot41.tnq7c4y4.cc", "st": "上渠道"},
+  {"name": "91短视频【SF152】", "dl": "https://o996q.xfwx2fgcp.cc/2HOCN84HXL", "st": "上渠道"},
+  {"name": "Pornhub免费版【AI16】", "dl": "http://www.match16.xyz/", "st": "开发中"},
+  {"name": "豆包短剧【AI26】", "dl": "https://www.doubaox.xyz/", "st": "开发中"},
+  {"name": "R星精选【SF05】", "dl": "https://rxing009.vip", "st": "上渠道"},
+  {"name": "夸克视频【SF65】", "dl": "https://kuake999.vip", "st": "上渠道"},
+  {"name": "豆包视频【SF96】", "dl": "https://doubao999.vip", "st": "上渠道"},
+  {"name": "91看片【SF98】", "dl": "https://91kp009.vip", "st": "上渠道"},
+  {"name": "即梦视频【SF158】", "dl": "https://jmsp.my", "st": "上渠道"},
+  {"name": "【—】", "dl": "-", "st": "下渠道"},
+  {"name": "【—】", "dl": "-", "st": ""},
+  {"name": "ins成人版【SF51】", "dl": "https://sf51.fuqhbbqt.cc/", "st": "上渠道"},
+  {"name": "油管18+【SF58】", "dl": "https://sf58.cef6qtuzy.cc/", "st": "上渠道"},
+  {"name": "onlyfans【SF59】", "dl": "https://sf59.uy2kuxncav.cc/", "st": "上渠道"},
+  {"name": "在校生vlog【SF97】", "dl": "https://sf97.rfwkeh47.cc/", "st": "上渠道"},
+  {"name": "少女学院【SF90】", "dl": "https://sf90.qxn4wqtuw2.cc/", "st": "上渠道"},
+  {"name": "性瘾日记【SF189】", "dl": "https://sf189.kf7nqusygj.cc/", "st": "下渠道"},
+  {"name": "免费看片【SF36】", "dl": "https://sf36.pmfuu5xp.cc/", "st": "上渠道"},
+  {"name": "涂鸦射【SF80】", "dl": "https://sir.yjyskgcm.top/", "st": "上渠道"},
+  {"name": "fansly【SF20】", "dl": "https://aaa.2q4je99efb.cc", "st": "上渠道"},
+  {"name": "Netflix【SF52】", "dl": "https://asdx.tddz3rms2t.cc", "st": "上渠道"},
+  {"name": "51看片【SF95】", "dl": "https://asdx.emxtyakd.cc", "st": "上渠道"},
+  {"name": "小污女【SF79】", "dl": "https://aaa.k7j6uubgu2.cc", "st": "上渠道"},
+  {"name": "番茄短剧【DFA-06】", "dl": "https://nkaaxhwy.cc", "st": "下渠道"},
+  {"name": "onlymuse【DFA-10】", "dl": "-", "st": "开发中"},
+  {"name": "JVID【SF57】", "dl": "jvid.my", "st": "上渠道"},
+  {"name": "浪浪山【SF60】", "dl": "llspro.com", "st": "上渠道"},
+  {"name": "Umate【SF67】", "dl": "umat.cc", "st": "上渠道"},
+  {"name": "TRE【SF75】", "dl": "tresp.cc", "st": "上渠道"},
+  {"name": "KiMi破解版【SF106】", "dl": "kimisp.cc", "st": "上渠道"},
+  {"name": "天天吃瓜【SF988】", "dl": "https://ttcg.cc/", "st": "开发中"},
+  {"name": "插百道【SF61】", "dl": "https://chabd.vip", "st": "上渠道"},
+  {"name": "【—】", "dl": "-", "st": "下渠道"},
+  {"name": "豆瓣影视【SF39】", "dl": "http://dbys2026.com/", "st": "上渠道"},
+  {"name": "Soul【SF50】", "dl": "https://soul001.com", "st": "上渠道"},
+  {"name": "度娘【SF66】", "dl": "https://duniang1001.com/", "st": "上渠道"},
+  {"name": "猫扑MOP【SF71】", "dl": "maopu2026.com", "st": "上渠道"},
+  {"name": "头条破解版【SF89】", "dl": "kktv2025.com", "st": "上渠道"},
+  {"name": "云播短视频【SF179】", "dl": "https://i2cbhci.pkp7p559qp.cc", "st": "下渠道"},
+  {"name": "色色AI【DFB01】", "dl": "https://nbaiai.com/download?utm_source=seseso_df_01&utm_medium=seseme_df_01&utm_campaign=seseca_df_01&channelCode=x4CKAfIS", "st": "上渠道"},
+  {"name": "花椒vlog【SF120】", "dl": "https://huajiaocr.cc", "st": "下渠道"},
+  {"name": "小欲猫【SF157】", "dl": "https://xiaoyumao.app", "st": "下渠道"},
+  {"name": "她趣【SF171】", "dl": "https://taqukp.app", "st": "下渠道"},
+  {"name": "悄咪咪【AI05】", "dl": "https://h5.qmimi.tv", "st": "开发中"},
+  {"name": "SmeetH【SF63】", "dl": "https://smeeth.tv", "st": "上渠道"},
+  {"name": "七度空间【SF94】", "dl": "https://7dkj.tv/", "st": "上渠道"},
+  {"name": "极乐园【SF104】", "dl": "https://jley.tv/", "st": "上渠道"},
+  {"name": "蜜桃破解版【SF62】", "dl": "https://mttv.tv", "st": "上渠道"},
+  {"name": "奶瓶【SF145】", "dl": "http://naip.cc/", "st": "下渠道"},
+  {"name": "绿帽龟【DFA04】", "dl": "https://lvmaogui.tv", "st": "开发中"},
+  {"name": "飞猪吃瓜网(母站)【DF-001】", "dl": "https://fzcgw.com/", "st": "已上线"},
+  {"name": "黄豆短剧(母站)【DF-002】", "dl": "https://hddj.tv/", "st": "已上线"},
+  {"name": "511短剧(子站)【DF-003】", "dl": "https://51dj.tv", "st": "已上线"},
+  {"name": "夜幕影社【DF-004】", "dl": "https://yemuying.com", "st": "已上线"},
+  {"name": "51视频网【DF-005】", "dl": "https://51spgw.com", "st": "已上线"},
+  {"name": "引流站群【DFZQ-001】", "dl": "https://www.tangxinvideo.hl.cn/", "st": "已上线"},
+  {"name": "引流站群【DFZQ-002】", "dl": "https://93bao.com/", "st": "已上线"},
+  {"name": "引流站群【DFZQ-003】", "dl": "http://jtyad.com/", "st": "已上线"},
+  {"name": "引流站群【DFZQ-004】", "dl": "https://tv.bytvv.cc/", "st": "已上线"},
+  {"name": "黄豆魔改短剧【DFA-03】", "dl": "hddj30.com", "st": ""},
+  {"name": "黄豆魔改短剧【DFA-03】", "dl": "hddj30.com", "st": ""},
+  {"name": "黄豆魔改短剧【DFA-03】", "dl": "hddj30.com", "st": ""},
+  {"name": "黄豆魔改短剧【DFA-03】", "dl": "hddj30.com", "st": ""},
+  {"name": "黄豆魔改短剧【DFA-03】", "dl": "hddj30.com", "st": ""},
+  {"name": "黄豆魔改短剧【DFA-03】", "dl": "hddj30.com", "st": ""},
+  {"name": "黄豆魔改短剧【DFA-03】", "dl": "hddj30.com", "st": ""},
+  {"name": "黄豆魔改短剧【DFA-03】", "dl": "hddj30.com", "st": ""},
+  {"name": "黄豆魔改短剧【DFA-03】", "dl": "hddj30.com", "st": ""},
+  {"name": "黄豆魔改短剧【DFA-03】", "dl": "hddj30.com", "st": ""},
+  {"name": "黄桃魔改【AI22】", "dl": "http://51htmg.com/", "st": ""},
+  {"name": "软糖【DFA-11】", "dl": "https://rt988.com", "st": ""}
+];
+// DINGFENG_DATA_END
+// 鼎丰专属卡片：显示落地页链接(每小时自动刷新)，不走 ovr 覆盖
+function makeDingfengCard(p){
+  const url = p.dl || '';
+  const st = p.st ? `<span class="badge" style="background:#eef;color:#4b5bd4;margin-left:6px">${p.st}</span>` : '';
+  const row = url
+    ? `<li class="domain-item"><span class="type-tag dl">下载链接</span><span class="domain-url"><a href="${url}" target="_blank">${url}</a></span><button class="copy-btn" onclick="copyUrl('${url}')">复制</button></li>`
+    : '<li class="domain-item"><span class="no-domain">暂无链接</span></li>';
+  return `<div class="platform-card"><div class="platform-name">${p.name} <span class="badge ok">✓</span>${st}</div><ul class="domain-list">${row}</ul></div>`;
+}
+function renderDingfeng(){
+  const el = document.getElementById('dingfeng-platforms');
+  if(!el) return;
+  el.innerHTML = dingfengData.length ? dingfengData.map(makeDingfengCard).join('')
+    : '<div style="color:#6b7280;font-size:13px;padding:20px 0">鼎丰数据尚未生成</div>';
+  const cnt = document.getElementById('dingfeng-count'); if(cnt) cnt.textContent = dingfengData.length;
+  const lc = document.getElementById('dingfeng-link-count'); if(lc) lc.textContent = dingfengData.filter(p=>p.dl).length;
+  const ut = document.getElementById('dingfeng-update-time'); if(ut) ut.textContent = dingfengUpdatedAt ? ('更新于 '+dingfengUpdatedAt) : '';
+}
+renderDingfeng();
 
 
 function showSection(id, el) {
