@@ -2841,6 +2841,7 @@ try { fillActivityPlatforms(); renderActivityUpdates(); renderActivity(); } catc
         <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="nodomain"> 无启用域名</label>
         <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="report"> 数据报表</label>
         <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="followup"> 待跟进事项</label>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="ops"> 运维控制台</label>
       </div>
     </div>
     <button class="adm-btn primary" onclick="adminCreate()">新增账号</button>
@@ -2865,7 +2866,7 @@ try { fillActivityPlatforms(); renderActivityUpdates(); renderActivity(); } catc
 
   const sb = supabase.createClient(SB_URL, SB_ANON);
 
-  const ALL_SECTIONS = ['dl','aiengine','nodomain','report','followup'];
+  const ALL_SECTIONS = ['dl','aiengine','nodomain','report','followup','ops'];
 
   // 检查 session，显示中文名 + 权限控制 + admin 按钮
   sb.auth.getUser().then(({data:{user}})=>{
@@ -2922,7 +2923,7 @@ try { fillActivityPlatforms(); renderActivityUpdates(); renderActivity(); } catc
     const users = d.users || [];
     const tbody = document.getElementById('userTbody');
     if(!users.length){ tbody.innerHTML='<tr><td colspan="4" style="color:#aaa">暂无账号</td></tr>'; return; }
-    const secLabel = {dl:'下载链接',aiengine:'AI引擎',nodomain:'无启用域名',report:'数据报表',followup:'待跟进'};
+    const secLabel = {dl:'下载链接',aiengine:'AI引擎',nodomain:'无启用域名',report:'数据报表',followup:'待跟进',ops:'运维控制台'};
     tbody.innerHTML = users.map(u=>{
       const loginName = u.email.replace('@hr.co','');
       const displayName = (u.user_metadata||{}).display_name || loginName;
