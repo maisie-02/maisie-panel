@@ -666,10 +666,29 @@
       <div class="stat-card"><div class="stat-num" id="scripts-count">-</div><div class="stat-label">话术总数</div></div>
       <div class="stat-card"><div class="stat-num" id="scripts-match">-</div><div class="stat-label">当前筛选</div></div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;">
-      <input id="scripts-q" class="scripts-filter" type="search" placeholder="搜索 关键字 / 话术 / 平台" oninput="filterScripts()" style="flex:1;min-width:200px;">
-      <select id="scripts-cat" class="scripts-filter" onchange="filterScripts()"><option value="">全部分类</option></select>
-      <select id="scripts-co" class="scripts-filter" onchange="filterScripts()"><option value="">全部公司</option></select>
+    <div class="scripts-filters" style="margin:14px 0;">
+      <style>.scripts-frow { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; } .scripts-flabel { min-width:150px; font-weight:600; font-size:13px; }</style>
+      <div class="scripts-frow">
+        <span class="scripts-flabel" id="scripts-cat-label">🏷 分类: 全部 ▾</span>
+        <select id="scripts-cat" class="scripts-filter" onchange="onScriptFilterChange('cat')"><option value="">全部</option></select>
+        <input id="scripts-cat-q" class="scripts-filter" type="search" placeholder="🔍 搜索分类" oninput="narrowScriptFilter('cat')" style="flex:1;min-width:160px;">
+        <button class="copy-btn" onclick="clearScriptFilter('cat')">清除</button>
+        <button class="copy-btn" onclick="filterScripts()">完成</button>
+      </div>
+      <div class="scripts-frow">
+        <span class="scripts-flabel" id="scripts-co-label">🏢 子公司: 全部 ▾</span>
+        <select id="scripts-co" class="scripts-filter" onchange="onScriptFilterChange('co')"><option value="">全部</option></select>
+        <input id="scripts-co-q" class="scripts-filter" type="search" placeholder="🔍 搜索子公司" oninput="narrowScriptFilter('co')" style="flex:1;min-width:160px;">
+        <button class="copy-btn" onclick="clearScriptFilter('co')">清除</button>
+        <button class="copy-btn" onclick="filterScripts()">完成</button>
+      </div>
+      <div class="scripts-frow">
+        <span class="scripts-flabel" id="scripts-plat-label">📂 平台: 全部 ▾</span>
+        <select id="scripts-plat" class="scripts-filter" onchange="onScriptFilterChange('plat')"><option value="">全部</option></select>
+        <input id="scripts-plat-q" class="scripts-filter" type="search" placeholder="🔍 搜索平台" oninput="narrowScriptFilter('plat')" style="flex:1;min-width:160px;">
+        <button class="copy-btn" onclick="clearScriptFilter('plat')">清除</button>
+        <button class="copy-btn" onclick="filterScripts()">完成</button>
+      </div>
     </div>
     <div style="overflow-x:auto;">
       <table class="scripts-table">
@@ -1339,13 +1358,13 @@ const yipin3Data = [];
 
 // ── 悦达（由 yueda_update.py 读源头群 [Yes] 小串生成；格式同逸品，用 dl 存下载链接）──
 // YUEDA_DATA_START
-const yuedaUpdatedAt = "2026-10-24 12:20";
+const yuedaUpdatedAt = "2026-10-24 13:20";
 const yuedaData = [
   {"name": "50度灰【DX-078】", "dl": "https://a4f.8n98g8t34.cc"},
   {"name": "汤头条【DX-079】", "dl": "https://480.yc06p19k.cc"},
   {"name": "91短视频【DX-015】", "dl": "https://c96.obivol9t.cc"},
   {"name": "91PORN【DX-092】", "dl": "https://706c.e08x80a97.cc"},
-  {"name": "TikTok【DX-036】", "dl": "https://c1ff.p8ihp2ij1.cc"},
+  {"name": "TikTok【DX-036】", "dl": "https://79a16c.t293atf9.cc"},
   {"name": "youtube【DX-004】", "dl": "https://3789.7856yz4r.cc"},
   {"name": "黄色仓库【DX-026】", "dl": "https://dab7.so9400r4j.cc"},
   {"name": "洛丽塔【DX-094】", "dl": "https://3a35.q4dl9ba1.cc"},
@@ -3168,28 +3187,74 @@ function spEsc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+// 三个筛选行与参考版一致：分类 / 子公司 / 平台
+const SCRIPT_FILTERS = [
+  {key: 'cat', icon: '🏷', label: '分类', field: '分类'},
+  {key: 'co', icon: '🏢', label: '子公司', field: '公司'},
+  {key: 'plat', icon: '📂', label: '平台', field: '子公司/平台'},
+];
+const scriptOpts = {};
+
+// 多值字段拆成单个值，去掉尾部的产品编号（如 " DX-003"）
+function scriptTokens(v) {
+  return String(v == null ? '' : v).split(/[、，,·]/)
+    .map(s => s.replace(/[\s-]*[A-Z]{1,3}-\d+$/, '').trim()).filter(Boolean);
+}
+
 function initScriptsPanel() {
-  const fill = (id, vals) => {
-    const sel = document.getElementById(id);
-    [...new Set(vals)].filter(Boolean).sort((a, b) => a.localeCompare(b, 'zh')).forEach(v => {
-      const o = document.createElement('option');
-      o.value = v; o.textContent = v; sel.appendChild(o);
-    });
-  };
-  fill('scripts-cat', SCRIPTS_DATA.map(r => r['分类']));
-  fill('scripts-co', SCRIPTS_DATA.map(r => r['公司']));
+  SCRIPT_FILTERS.forEach(f => {
+    const set = new Set();
+    SCRIPTS_DATA.forEach(r => scriptTokens(r[f.field]).forEach(t => set.add(t)));
+    scriptOpts[f.key] = [...set].sort((a, b) => a.localeCompare(b, 'zh'));
+    fillScriptSelect(f.key, '');
+  });
   document.getElementById('scripts-count').textContent = SCRIPTS_DATA.length;
   filterScripts();
 }
 
+function fillScriptSelect(key, q) {
+  const sel = document.getElementById('scripts-' + key);
+  const cur = sel.value;
+  const kw = q.trim().toLowerCase();
+  sel.innerHTML = '<option value="">全部</option>';
+  scriptOpts[key].filter(t => t === cur || !kw || t.toLowerCase().includes(kw)).forEach(t => {
+    const o = document.createElement('option');
+    o.value = t; o.textContent = t; sel.appendChild(o);
+  });
+  sel.value = cur;
+}
+
+function narrowScriptFilter(key) {
+  fillScriptSelect(key, document.getElementById('scripts-' + key + '-q').value);
+}
+
+function setScriptLabel(key) {
+  const f = SCRIPT_FILTERS.find(x => x.key === key);
+  const v = document.getElementById('scripts-' + key).value;
+  document.getElementById('scripts-' + key + '-label').textContent = `${f.icon} ${f.label}: ${v || '全部'} ▾`;
+}
+
+function onScriptFilterChange(key) {
+  setScriptLabel(key);
+  filterScripts();
+}
+
+function clearScriptFilter(key) {
+  document.getElementById('scripts-' + key + '-q').value = '';
+  document.getElementById('scripts-' + key).value = '';
+  fillScriptSelect(key, '');
+  setScriptLabel(key);
+  filterScripts();
+}
+
 function filterScripts() {
-  const q = document.getElementById('scripts-q').value.trim().toLowerCase();
   const cat = document.getElementById('scripts-cat').value;
   const co = document.getElementById('scripts-co').value;
+  const plat = document.getElementById('scripts-plat').value;
   scriptsFiltered = SCRIPTS_DATA.filter(r =>
-    (!cat || r['分类'] === cat) &&
-    (!co || r['公司'] === co) &&
-    (!q || (r['关键字'] + ' ' + r['话术'] + ' ' + r['子公司/平台']).toLowerCase().includes(q)));
+    (!cat || scriptTokens(r['分类']).includes(cat)) &&
+    (!co || scriptTokens(r['公司']).includes(co)) &&
+    (!plat || scriptTokens(r['子公司/平台']).includes(plat)));
   document.getElementById('scripts-match').textContent = scriptsFiltered.length;
   document.getElementById('scripts-tbody').innerHTML = '';
   showMoreScripts();
