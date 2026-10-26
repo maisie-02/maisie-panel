@@ -1819,8 +1819,8 @@ async function doUploadYipin() {
   log(`标签页: ${sheet}`);
   const oVals = await readRange(token, YIPIN_ID, `${sheet}!O3:O300`);
   const YIPIN_IGNORE = ['YYLX','YJZ','CMD','uu加速器','白嫖射','好妻网','SM课堂','妻友会'];  // 系统网址表无对应行，忽视不上传(2026-10-18 好妻网web→好妻网)
-  const s1list = yipinData.filter(p=>p.name && p.dl && !YIPIN_IGNORE.includes(p.name));   // 站1平台，只配 O3-O21
-  const s2list = yipin2Data.filter(p=>p.name && p.dl && !YIPIN_IGNORE.includes(p.name));  // 站2平台，只配 O22-O54
+  const s1list = yipinData.filter(p=>p.name && (p.dl||p.h5) && !YIPIN_IGNORE.includes(p.name));   // 站1平台，只配 O3-O21
+  const s2list = yipin2Data.filter(p=>p.name && (p.dl||p.h5) && !YIPIN_IGNORE.includes(p.name));  // 站2平台，只配 O22-O54
   // 好妻网 O 列的别名 → 面板平台名（补齐格式差异）
   const YIPIN_ALIAS = {
     'Pornhub': ['ph'], 'TikTok': ['tt'], 'Redgift': ['rg'],
@@ -1850,7 +1850,13 @@ async function doUploadYipin() {
     else if(rowNo>=22 && rowNo<=54) list=s2list;   // 站2段 O22-O54 只配站2平台
     else continue;                                  // 超出范围忽略
     const p = matchCell(cell, list);
-    if(p){ updates.push({range:`${sheet}!Q${i+3}`,values:[[ovr(p.name,'dl',p.dl)]]}); matched++; }  // 用面板显示值(暂停时=冻结链接)
+    if(p){   // 用面板显示值(暂停/手改时=冻结链接)。Q=落地页、S=在线观看(H5)
+      const _dl = ovr(p.name,'dl',p.dl||'');
+      const _h5 = ovr(p.name,'h5',p.h5||'');
+      if(_dl) updates.push({range:`${sheet}!Q${i+3}`,values:[[_dl]]});
+      if(_h5) updates.push({range:`${sheet}!S${i+3}`,values:[[_h5]]});   // 2026-10-26 之前只传落地页，手改的H5上传不进来
+      matched++;
+    }
     else unmatched.push(cell.split(/[/／]/)[0]);
   }
   log(`匹配 ${matched} 个，写入 ${updates.length} 格...`);
