@@ -963,7 +963,7 @@ const h5Full = {
 const verifyAlerts = {"date": "2026-10-28 14:08", "items": [{"name": "字母圈", "type": "渠道", "info": "welcome"}, {"name": "黄色仓库", "type": "全民", "info": "91妈妈免费看片神器，你想看的这里都有"}, {"name": "黄色仓库", "type": "渠道", "info": "qq看片"}, {"name": "蜜穴逼城", "type": "全民", "info": "welcome"}, {"name": "探探", "type": "全民", "info": "蜜桃短剧"}, {"name": "探探", "type": "渠道", "info": "蜜桃短剧"}, {"name": "91视频", "type": "全民", "info": "?"}, {"name": "91视频", "type": "渠道", "info": "?"}, {"name": "P站", "type": "渠道", "info": "?"}]};
 // VERIFY_ALERTS_END
 // YIPIN_VERIFY_ALERTS_START
-const yipinVerifyAlerts = {"date": "2026-10-28 14:09", "items": [{"name": "Xvideos", "type": "逸品站1", "info": "?"}, {"name": "51吃瓜", "type": "逸品站2", "info": "?"}, {"name": "deepseek成人版", "type": "逸品站2", "info": "?"}, {"name": "B-CHAT", "type": "逸品站2", "info": "恰恰短剧 · 精彩短剧 随时开场"}, {"name": "Xvideos", "type": "逸品H5", "info": "?"}, {"name": "18R", "type": "逸品H5", "info": "loading.."}, {"name": "花花公子", "type": "逸品H5", "info": "loading.."}, {"name": "deepseek成人版", "type": "逸品H5", "info": "打不开:HTTPSConnectionPool(host='ds.x"}, {"name": "嫖虫巴士", "type": "逸品H5", "info": "打不开:HTTPSConnectionPool(host='pcbs"}]};
+const yipinVerifyAlerts = {"date": "2026-10-29 09:35", "items": [{"name": "Xvideos", "type": "逸品站1", "info": "?"}, {"name": "51吃瓜", "type": "逸品站2", "info": "?"}, {"name": "deepseek成人版", "type": "逸品站2", "info": "?"}, {"name": "B-CHAT", "type": "逸品站2", "info": "打不开:HTTPSConnectionPool(host='mkz2"}, {"name": "Xvideos", "type": "逸品H5", "info": "?"}, {"name": "18R", "type": "逸品H5", "info": "loading.."}, {"name": "花花公子", "type": "逸品H5", "info": "loading.."}, {"name": "deepseek成人版", "type": "逸品H5", "info": "打不开:HTTPSConnectionPool(host='ds.x"}]};
 // YIPIN_VERIFY_ALERTS_END
 
 let linkOverrides = {};  // { platform: { qm|qd|h5: url } }  来自 Supabase link_overrides 表
@@ -1210,7 +1210,6 @@ const yipin2Data = [
   {"name": "幼甜", "dl": "https://ph888.phnqcb.com"},
   {"name": "拨阴", "dl": "https://dzx3t2udhcnsl.cloudfront.net/", "h5": "https://by.wbk181.com/#/"},
   {"name": "台姬店", "dl": "https://dr6erji2v0val.cloudfront.net", "h5": "https://tjd.grx492.com/#/circle"},
-  {"name": "嫖虫巴士", "dl": "https://d25747xuvf4hlf.cloudfront.net", "h5": "https://pcbs.wer799.com"},
   {"name": "苍井空", "dl": "https://d3qmncmen7ibo4.cloudfront.net", "h5": "https://cjk.gay351.com"},
   {"name": "魅魔vlog", "dl": "https://d2rcbiec54alpl.cloudfront.net", "h5": "https://mmv.oho80.com"},
   {"name": "好莱坞", "dl": "https://ph888.phnqcb.com"},
@@ -1811,7 +1810,7 @@ async function doUploadYipin() {
   log(`标签页: ${sheet}`);
   const oVals = await readRange(token, YIPIN_ID, `${sheet}!O3:O300`);
   const YIPIN_IGNORE = ['YYLX','YJZ','CMD','uu加速器','白嫖射','好妻网','SM课堂','妻友会',
-    '猫眼票房','七宗罪','黄色小报','性达人','魅影','淫君子','潮汐映画','18禁漫','Redgift'];  // +2026-10-27 恒丰停服产品
+    '猫眼票房','七宗罪','黄色小报','性达人','魅影','淫君子','潮汐映画','18禁漫','Redgift','嫖虫巴士'];  // +2026-10-27 恒丰停服产品、+10-29嫖虫巴士
   const s1list = yipinData.filter(p=>p.name && (p.dl||p.h5) && !YIPIN_IGNORE.includes(p.name));   // 站1平台，只配 O3-O21
   const s2list = yipin2Data.filter(p=>p.name && (p.dl||p.h5) && !YIPIN_IGNORE.includes(p.name));  // 站2平台，只配 O22-O54
   // 好妻网 O 列的别名 → 面板平台名（补齐格式差异）
