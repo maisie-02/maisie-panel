@@ -965,7 +965,7 @@ function ovr(name, type, url){
 function isPaused(name, type){ const o = linkOverrides[name] && linkOverrides[name][type]; return !!(o && o.startsWith('PAUSE::')); }
 function isXlsx(name, type){ const o = linkOverrides[name] && linkOverrides[name][type]; return !!(o && o.startsWith('XLSX::')); }
 function isEdited(name, type){ const o = linkOverrides[name] && linkOverrides[name][type]; return !!(o && !o.startsWith('PAUSE::') && !o.startsWith('XLSX::')); }
-function labelOf(type){ return type==='qm'?'全民代理':type==='qd'?'渠道代理':type==='dl'?'亚马逊下载':'H5链接'; }
+function labelOf(type){ return type==='qm'?'全民代理':type==='qd'?'渠道代理':type==='dl'?'亚马逊下载':type==='ydl'?'下载链接':'H5链接'; }
 
 function makeRow(url, type, platform) {
   const label = labelOf(type);
@@ -1070,7 +1070,8 @@ async function loadOverrides(){
       (typeof otherData!=='undefined'?otherData:[]).map(p=>p.name),
       (typeof yipinData!=='undefined'?yipinData:[]).map(p=>p.name),
       (typeof yipin2Data!=='undefined'?yipin2Data:[]).map(p=>p.name),
-      (typeof yipin3Data!=='undefined'?yipin3Data:[]).map(p=>p.name)));
+      (typeof yipin3Data!=='undefined'?yipin3Data:[]).map(p=>p.name),
+      (typeof yuedaData!=='undefined'?yuedaData:[]).map(p=>p.name)));   // 悦达覆盖键(ydl)不算手动新增平台
     manualPlatforms = { hengrui: [], yipin: [] };
     Object.keys(linkOverrides).forEach(name => {
       if (baked.has(name)) return;
@@ -1334,7 +1335,7 @@ const yipin3Data = [];
 
 // ── 悦达（由 yueda_update.py 读源头群 [Yes] 小串生成；格式同逸品，用 dl 存下载链接）──
 // YUEDA_DATA_START
-const yuedaUpdatedAt = "2026-11-06 11:20";
+const yuedaUpdatedAt = "2026-11-06 12:16";
 const yuedaData = [
   {"name": "50度灰【DX-078】", "dl": "https://511.cyfhucnfr.cc"},
   {"name": "汤头条【DX-079】", "dl": "https://c7764.roxdsgbk.cc"},
@@ -1344,7 +1345,7 @@ const yuedaData = [
   {"name": "youtube【DX-004】", "dl": "https://c07b.tvbquylz.cc"},
   {"name": "黄色仓库【DX-026】", "dl": "https://04250.kqhlvywb.cc"},
   {"name": "洛丽塔【DX-094】", "dl": "https://94604.cvyixughw.cc"},
-  {"name": "51TikTok破解【DX-043】", "dl": "https://fa9.mnopjpgvt.cc"},
+  {"name": "51TikTok破解【DX-043】", "dl": "https://7d73be.falgwmpa.cc"},
   {"name": "片多多破解【DX-105】", "dl": "pddmf.com"},
   {"name": "PornHub中文【DX-037】", "dl": "https://568ab.zurqvxamr.cc"},
   {"name": "抖音Max【DX-038】", "dl": "https://2ae1.cmcdgnqua.cc"},
@@ -1389,7 +1390,7 @@ const yuedaData = [
   {"name": "撸先生【DX-059】", "dl": "https://478d5.eohdbxs.cc"},
   {"name": "果冻破解【DX-011】", "dl": "https://7daa.ijmlyrmt.cc"},
   {"name": "soul【DX-005】", "dl": "https://8c8.tlxcudt.cc"},
-  {"name": "懂色帝【DX-098】", "dl": "https://fd9e.usabkmgs.cc"},
+  {"name": "懂色帝【DX-098】", "dl": "https://www.dongsedi2.cc/#/"},
   {"name": "51快播【DX-060】", "dl": "https://3ece.mpeyynz.com"},
   {"name": "盒子-pornhub【DX-091】", "dl": "https://b973.yszsyazy.cc"},
   {"name": "51看片【DX-087】", "dl": "https://18d36.owkexgse.cc"},
@@ -1404,7 +1405,7 @@ const yuedaData = [
   {"name": "蝴蝶", "dl": ""},
   {"name": "黑料网App", "dl": "https://0ac.askejhfx.cc"},
   {"name": "黑料不打烊", "dl": "https://07489.kchtkzaa.cc"},
-  {"name": "91吃瓜", "dl": "https://07b3.ihnvnlnd.cc"},
+  {"name": "91吃瓜", "dl": "https://07b3.rblluoaz.cc"},
   {"name": "911爆料网", "dl": "https://e284.fssvsbde.cc"},
   {"name": "91爆料", "dl": "https://a44bf.atfgfdwg.cc"},
   {"name": "无极", "dl": ""},
@@ -1415,11 +1416,27 @@ const yuedaData = [
 ];
 // YUEDA_DATA_END
 // 悦达专属卡片：直接显示源头链接(每小时自动刷新)，不走 ovr 覆盖(避免与恒睿/逸品同名平台撞车)
+// 悦达下载行：带 复制/编辑/暂停覆盖，与恒睿/逸品一致。★覆盖键用专属 type 'ydl'★——
+// 悦达裸名产品(51吃瓜/海角网等)会与恒睿/逸品同名，用独立 type 保证 (名,ydl) 永不与它们的 qm/qd/h5/dl 串线。
+function makeYuedaRow(url, name){
+  const paused = isPaused(name,'ydl'), xlsx = isXlsx(name,'ydl'), edited = isEdited(name,'ydl');
+  const mark = paused ? ' <span style="color:#2563eb;font-size:11px">(🔒已暂停覆盖)</span>'
+             : xlsx   ? ' <span style="color:#047857;font-size:11px">(📋xlsx来源)</span>'
+             : edited ? ' <span style="color:#c2410c;font-size:11px">(已手改)</span>' : '';
+  const pauseBtn = (paused || xlsx)
+    ? `<button class="copy-btn" style="background:#dbeafe;color:#1e40af" onclick="resumeLink('${name}','ydl')">恢复覆盖</button>`
+    : `<button class="copy-btn" style="background:#f1f5f9;color:#475569" onclick="pauseLink('${name}','ydl','${url}')">暂停覆盖</button>`;
+  return `<li class="domain-item"><span class="type-tag dl">下载链接</span>
+    <span class="domain-url"><a href="${url}" target="_blank">${url}</a>${mark}</span>
+    <button class="copy-btn" onclick="copyUrl('${url}')">复制</button>
+    <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${name}','ydl')">编辑</button>
+    ${pauseBtn}</li>`;
+}
 function makeYuedaCard(p){
-  const url = p.dl || '';
-  const row = url
-    ? `<li class="domain-item"><span class="type-tag dl">下载链接</span><span class="domain-url"><a href="${url}" target="_blank">${url}</a></span><button class="copy-btn" onclick="copyUrl('${url}')">复制</button></li>`
-    : '<li class="domain-item"><span class="no-domain">暂无链接</span></li>';
+  const url = ovr(p.name, 'ydl', p.dl || '');   // 手改/暂停覆盖(ydl)优先于源头 dl
+  const row = url ? makeYuedaRow(url, p.name)
+    : `<li class="domain-item"><span class="no-domain" style="flex:1">暂无链接</span>
+       <button class="copy-btn" style="background:#eef2ff;color:#4338ca" onclick="editLink('${p.name}','ydl')">手填链接</button></li>`;
   return `<div class="platform-card"><div class="platform-name">${p.name} <span class="badge ok">✓</span></div><ul class="domain-list">${row}</ul></div>`;
 }
 function renderYueda(){
