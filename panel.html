@@ -960,7 +960,7 @@ const h5Full = {
 const verifyAlerts = {"date": "2026-11-06 12:48", "items": []};
 // VERIFY_ALERTS_END
 // YIPIN_VERIFY_ALERTS_START
-const yipinVerifyAlerts = {"date": "2026-11-06 13:43", "items": [{"name": "Xvideos", "type": "逸品站1", "info": "?"}, {"name": "51吃瓜", "type": "逸品站2", "info": "?"}, {"name": "B-CHAT", "type": "逸品站2", "info": "打不开:HTTPSConnectionPool(host='mkz2"}, {"name": "Xvideos", "type": "逸品H5", "info": "?"}, {"name": "18R", "type": "逸品H5", "info": "loading.."}, {"name": "花花公子", "type": "逸品H5", "info": "loading.."}]};
+const yipinVerifyAlerts = {"date": "2026-11-06 13:48", "items": [{"name": "Xvideos", "type": "逸品站1", "info": "?"}, {"name": "51吃瓜", "type": "逸品站2", "info": "?"}, {"name": "B-CHAT", "type": "逸品站2", "info": "打不开:HTTPSConnectionPool(host='mkz2"}, {"name": "Xvideos", "type": "逸品H5", "info": "?"}, {"name": "18R", "type": "逸品H5", "info": "loading.."}, {"name": "花花公子", "type": "逸品H5", "info": "loading.."}]};
 // YIPIN_VERIFY_ALERTS_END
 
 let linkOverrides = {};  // { platform: { qm|qd|h5: url } }  来自 Supabase link_overrides 表
@@ -1863,7 +1863,7 @@ async function doUploadYipin() {
   log(`标签页: ${sheet}`);
   const oVals = await readRange(token, YIPIN_ID, `${sheet}!O3:O300`);
   const YIPIN_IGNORE = ['YYLX','YJZ','CMD','uu加速器','白嫖射','好妻网','SM课堂','妻友会',
-    '猫眼票房','七宗罪','黄色小报','性达人','魅影','淫君子','潮汐映画','18禁漫','Redgift','嫖虫巴士','deepseek成人版'];  // +2026-10-27 恒丰停服、+10-29嫖虫巴士/成人Deepseek
+    '猫眼票房','七宗罪','黄色小报','性达人','魅影','淫君子','潮汐映画','18禁漫','Redgift','嫖虫巴士','deepseek成人版','B-CHAT'];  // +2026-10-27 恒丰停服、+10-29嫖虫巴士/成人Deepseek、+11-06 B-CHAT停更
   const s1list = yipinData.filter(p=>p.name && (p.dl||p.h5) && !YIPIN_IGNORE.includes(p.name));   // 站1平台，只配 O3-O21
   const s2list = yipin2Data.filter(p=>p.name && (p.dl||p.h5) && !YIPIN_IGNORE.includes(p.name));  // 站2平台，只配 O22-O54
   // 好妻网 O 列的别名 → 面板平台名（补齐格式差异）
