@@ -63,6 +63,9 @@
   .stat-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
   .stat-num { font-size: 26px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
   .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 5px; letter-spacing: 0.3px; }
+  .card-search { display:block; width:100%; max-width:380px; box-sizing:border-box; margin:14px 0 2px; padding:9px 13px; border-radius:9px; border:1px solid var(--card-border); background: var(--card-bg); color: inherit; font-size:13px; -webkit-backdrop-filter: var(--glass); backdrop-filter: var(--glass); }
+  .card-search:focus { outline:none; border-color: var(--accent); }
+  .card-search-empty { color: var(--text-muted); font-size:13px; padding:14px 2px; }
   .section { display: none; }
   .section.active { display: block; animation: fadeUp .32s cubic-bezier(.4,0,.2,1); }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -305,6 +308,7 @@
       <div class="stat-card"><div class="stat-num" id="main-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
     <div id="verify-alerts"></div>
+    <input class="card-search" type="search" placeholder="🔍 搜索平台名称（输入任意一个字即可）" oninput="filterCards('main-platforms', this.value)" aria-label="搜索平台">
     <div id="main-platforms"></div>
   </div>
 
@@ -318,6 +322,7 @@
       <div class="stat-card"><div class="stat-num">15</div><div class="stat-label">有效子平台</div></div>
       <div class="stat-card"><div class="stat-num" id="other-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
+    <input class="card-search" type="search" placeholder="🔍 搜索平台名称（输入任意一个字即可）" oninput="filterCards('other-platforms', this.value)" aria-label="搜索平台">
     <div id="other-platforms"></div>
   </div>
 
@@ -333,6 +338,7 @@
       <div class="stat-card"><div class="stat-num">37</div><div class="stat-label">平台总数</div></div>
       <div class="stat-card"><div class="stat-num" id="yipin2-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
+    <input class="card-search" type="search" placeholder="🔍 搜索平台名称（输入任意一个字即可）" oninput="filterCards('yipin2-platforms', this.value)" aria-label="搜索平台">
     <div id="yipin2-platforms"></div>
   </div>
 
@@ -347,6 +353,7 @@
       <div class="stat-card"><div class="stat-num">22</div><div class="stat-label">平台总数</div></div>
       <div class="stat-card"><div class="stat-num" id="yipin-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
+    <input class="card-search" type="search" placeholder="🔍 搜索平台名称（输入任意一个字即可）" oninput="filterCards('yipin-platforms', this.value)" aria-label="搜索平台">
     <div id="yipin-platforms"></div>
   </div>
 
@@ -360,6 +367,7 @@
       <div class="stat-card"><div class="stat-num">5</div><div class="stat-label">平台总数</div></div>
       <div class="stat-card"><div class="stat-num" id="ai-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
+    <input class="card-search" type="search" placeholder="🔍 搜索平台名称（输入任意一个字即可）" oninput="filterCards('ai-platforms', this.value)" aria-label="搜索平台">
     <div id="ai-platforms"></div>
   </div>
 
@@ -642,6 +650,7 @@
       <div class="stat-card"><div class="stat-num" id="yueda-count">-</div><div class="stat-label">平台总数</div></div>
       <div class="stat-card"><div class="stat-num" id="yueda-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
+    <input class="card-search" type="search" placeholder="🔍 搜索平台名称（输入任意一个字即可）" oninput="filterCards('yueda-platforms', this.value)" aria-label="搜索平台">
     <div id="yueda-platforms"></div>
   </div>
 
@@ -696,6 +705,7 @@
       <div class="stat-card"><div class="stat-num" id="dingfeng-count">-</div><div class="stat-label">平台总数</div></div>
       <div class="stat-card"><div class="stat-num" id="dingfeng-link-count">-</div><div class="stat-label">链接总数</div></div>
     </div>
+    <input class="card-search" type="search" placeholder="🔍 搜索平台名称（输入任意一个字即可）" oninput="filterCards('dingfeng-platforms', this.value)" aria-label="搜索平台">
     <div id="dingfeng-platforms"></div>
   </div>
 
@@ -1416,6 +1426,28 @@ const yuedaData = [
 ];
 // YUEDA_DATA_END
 // 悦达专属卡片：直接显示源头链接(每小时自动刷新)，不走 ovr 覆盖(避免与恒睿/逸品同名平台撞车)
+// 平台卡搜索：输入任意子串(一个字也行)即过滤当前板块卡片，按平台名(含【编号】)匹配。各下载板块复用。
+function filterCards(containerId, q){
+  q = (q || '').trim().toLowerCase();
+  const box = document.getElementById(containerId);
+  if (!box) return;
+  let shown = 0;
+  box.querySelectorAll('.platform-card').forEach(card => {
+    const el = card.querySelector('.platform-name');
+    const nm = ((el && el.textContent) || '').toLowerCase();
+    const hit = !q || nm.includes(q);
+    card.style.display = hit ? '' : 'none';
+    if (hit) shown++;
+  });
+  // 无结果提示
+  let tip = box.parentNode.querySelector('.card-search-empty');
+  if (q && shown === 0){
+    if (!tip){ tip = document.createElement('div'); tip.className = 'card-search-empty'; box.parentNode.insertBefore(tip, box.nextSibling); }
+    tip.textContent = `没有包含「${q}」的平台`;
+    tip.style.display = '';
+  } else if (tip){ tip.style.display = 'none'; }
+}
+
 // 悦达下载行：带 复制/编辑/暂停覆盖，与恒睿/逸品一致。★覆盖键用专属 type 'ydl'★——
 // 悦达裸名产品(51吃瓜/海角网等)会与恒睿/逸品同名，用独立 type 保证 (名,ydl) 永不与它们的 qm/qd/h5/dl 串线。
 function makeYuedaRow(url, name){
